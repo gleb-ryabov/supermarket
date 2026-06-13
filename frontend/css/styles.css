@@ -1,0 +1,67 @@
+:root {
+    --app-bg: #f4f7fb;
+    --app-dark: #182235;
+    --app-primary: #2454a6;
+}
+
+body {
+    background: var(--app-bg);
+    color: #1f2937;
+}
+
+.app-navbar {
+    background: linear-gradient(135deg, var(--app-dark), #203b73);
+    box-shadow: 0 8px 24px rgba(24, 34, 53, 0.18);
+}
+
+.card {
+    border-radius: 18px;
+}
+
+.side-card {
+    top: 24px;
+}
+
+.list-group-item {
+    border: 0;
+    border-radius: 12px !important;
+    margin-bottom: 6px;
+    cursor: pointer;
+}
+
+.list-group-item.active {
+    background: var(--app-primary);
+}
+
+.btn-primary {
+    background: var(--app-primary);
+    border-color: var(--app-primary);
+}
+
+.table thead th {
+    background: #edf2fb;
+    color: #334155;
+    white-space: nowrap;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.id-cell {
+    max-width: 180px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.empty-state {
+    padding: 48px 16px;
+    text-align: center;
+    color: #64748b;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #334155;
+}

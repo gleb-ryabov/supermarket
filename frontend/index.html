@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Магазин продовольственных товаров</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark app-navbar">
+    <div class="container-fluid px-4">
+        <span class="navbar-brand fw-semibold">БД «Магазин продовольственных товаров»</span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="topNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><button class="nav-link btn btn-link active" id="tablesModeBtn">Таблицы</button></li>
+                <li class="nav-item"><button class="nav-link btn btn-link" id="reportsModeBtn">Отчеты</button></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container-fluid px-4 py-4">
+    <div id="alertBox"></div>
+
+    <section id="tablesSection">
+        <div class="row g-4">
+            <aside class="col-12 col-xl-2">
+                <div class="card shadow-sm border-0 sticky-xl-top side-card">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted mb-3">Разделы БД</h6>
+                        <div class="list-group list-group-flush" id="entityList"></div>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="col-12 col-xl-10">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap justify-content-between gap-3 align-items-start mb-3">
+                            <div>
+                                <h3 class="mb-1" id="entityTitle">Таблица</h3>
+                                <p class="text-muted mb-0" id="entityDescription">Просмотр, поиск, добавление, редактирование и удаление записей.</p>
+                            </div>
+                            <button class="btn btn-primary" id="addBtn">Добавить запись</button>
+                        </div>
+                        <form class="row g-3 align-items-end" id="filterForm"></form>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Данные</h5>
+                            <button class="btn btn-outline-secondary btn-sm" id="refreshBtn">Обновить</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="dataTable"></table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <section id="reportsSection" class="d-none">
+        <div class="row g-4">
+            <aside class="col-12 col-xl-3">
+                <div class="card shadow-sm border-0 side-card">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted mb-3">Отчеты</h6>
+                        <div class="list-group list-group-flush" id="reportList"></div>
+                    </div>
+                </div>
+            </aside>
+            <section class="col-12 col-xl-9">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap justify-content-between gap-3 align-items-start mb-3">
+                            <div>
+                                <h3 class="mb-1" id="reportTitle">Отчет</h3>
+                                <p class="text-muted mb-0" id="reportDescription">Формирование отчета и вывод результата на экран.</p>
+                            </div>
+                            <button class="btn btn-outline-secondary" id="runReportBtn">Сформировать</button>
+                        </div>
+                        <form class="row g-3 align-items-end" id="reportFilterForm"></form>
+                    </div>
+                </div>
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="mb-3">Результат отчета</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped align-middle" id="reportTable"></table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+</main>
+
+<div class="modal fade" id="entityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Запись</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form id="entityForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editingId">
+                    <div class="row g-3" id="formFields"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

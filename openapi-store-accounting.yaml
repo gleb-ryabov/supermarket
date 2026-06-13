@@ -1,0 +1,920 @@
+openapi: 3.0.3
+info:
+  title: Store Accounting API
+  version: 1.0.0
+  description: >
+    REST API for a small store accounting frontend. Base path is /api.
+    Frontend expects JSON responses and JSON request bodies.
+servers:
+  - url: http://localhost:8080/api
+
+tags:
+  - name: ProductTypes
+  - name: Products
+  - name: Prices
+  - name: Suppliers
+  - name: ProductSupplies
+  - name: Stock
+  - name: Sales
+  - name: ProductSales
+  - name: Cancellations
+  - name: Reports
+
+paths:
+  /product-types:
+    get:
+      tags: [ProductTypes]
+      summary: List product types
+      parameters:
+        - $ref: '#/components/parameters/Search'
+        - name: for_adult
+          in: query
+          schema: { type: boolean }
+          description: Filter by 18+ flag.
+      responses:
+        '200':
+          description: Product type list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProductType' }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      tags: [ProductTypes]
+      summary: Create product type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductTypeInput' }
+      responses:
+        '201':
+          description: Created product type
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductType' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /product-types/{type_id}:
+    parameters:
+      - $ref: '#/components/parameters/TypeId'
+    put:
+      tags: [ProductTypes]
+      summary: Update product type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductTypeInput' }
+      responses:
+        '200':
+          description: Updated product type
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductType' }
+        default: { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [ProductTypes]
+      summary: Delete product type
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /products:
+    get:
+      tags: [Products]
+      summary: List products
+      parameters:
+        - $ref: '#/components/parameters/Search'
+        - name: type_id
+          in: query
+          schema: { type: integer }
+          description: Filter by product type.
+      responses:
+        '200':
+          description: Product list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Product' }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      tags: [Products]
+      summary: Create product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductInput' }
+      responses:
+        '201':
+          description: Created product
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /products/{product_id}:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+    put:
+      tags: [Products]
+      summary: Update product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductInput' }
+      responses:
+        '200':
+          description: Updated product
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+        default: { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [Products]
+      summary: Delete product
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /prices:
+    get:
+      tags: [Prices]
+      summary: List product prices
+      parameters:
+        - $ref: '#/components/parameters/ProductIdQuery'
+        - $ref: '#/components/parameters/DateFrom'
+        - $ref: '#/components/parameters/DateTo'
+      responses:
+        '200':
+          description: Price list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Price' }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      tags: [Prices]
+      summary: Create product price
+      description: total_price should equal full_price * (1 - discount / 100). Backend should validate or recalculate it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PriceInput' }
+      responses:
+        '201':
+          description: Created price
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Price' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /prices/{price_id}:
+    parameters:
+      - $ref: '#/components/parameters/PriceId'
+    put:
+      tags: [Prices]
+      summary: Update product price
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PriceInput' }
+      responses:
+        '200':
+          description: Updated price
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Price' }
+        default: { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [Prices]
+      summary: Delete product price
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /suppliers:
+    get:
+      tags: [Suppliers]
+      summary: List suppliers
+      parameters:
+        - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Supplier list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Supplier' }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      tags: [Suppliers]
+      summary: Create supplier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SupplierInput' }
+      responses:
+        '201':
+          description: Created supplier
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Supplier' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /suppliers/{supplier_id}:
+    parameters:
+      - $ref: '#/components/parameters/SupplierId'
+    put:
+      tags: [Suppliers]
+      summary: Update supplier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SupplierInput' }
+      responses:
+        '200':
+          description: Updated supplier
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Supplier' }
+        default: { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [Suppliers]
+      summary: Delete supplier
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /product-supplies:
+    get:
+      tags: [ProductSupplies]
+      summary: List product supplies
+      parameters:
+        - $ref: '#/components/parameters/ProductIdQuery'
+        - name: supplier_id
+          in: query
+          schema: { type: integer }
+        - $ref: '#/components/parameters/DateFrom'
+        - $ref: '#/components/parameters/DateTo'
+      responses:
+        '200':
+          description: Product supply list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProductSupply' }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      tags: [ProductSupplies]
+      summary: Create product supply
+      description: Backend should increase stock quantity by supplied quantity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductSupplyInput' }
+      responses:
+        '201':
+          description: Created product supply
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductSupply' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /product-supplies/{supply_id}:
+    parameters:
+      - $ref: '#/components/parameters/SupplyId'
+    put:
+      tags: [ProductSupplies]
+      summary: Update product supply
+      description: Backend should adjust stock by the difference between old and new supply quantity/product.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductSupplyInput' }
+      responses:
+        '200':
+          description: Updated product supply
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductSupply' }
+        default: { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [ProductSupplies]
+      summary: Delete product supply
+      description: Backend should decrease stock by the deleted supply quantity.
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /stock:
+    get:
+      tags: [Stock]
+      summary: List stock balances
+      parameters:
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/ProductIdQuery'
+      responses:
+        '200':
+          description: Stock list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Stock' }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      tags: [Stock]
+      summary: Create stock balance
+      description: Usually one stock row per product. Reject duplicates or upsert by product_id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StockInput' }
+      responses:
+        '201':
+          description: Created stock balance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Stock' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /stock/{stock_id}:
+    parameters:
+      - $ref: '#/components/parameters/StockId'
+    put:
+      tags: [Stock]
+      summary: Update stock balance manually
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StockInput' }
+      responses:
+        '200':
+          description: Updated stock balance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Stock' }
+        default: { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [Stock]
+      summary: Delete stock balance
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /sales:
+    get:
+      tags: [Sales]
+      summary: List sales
+      parameters:
+        - $ref: '#/components/parameters/DateFrom'
+        - $ref: '#/components/parameters/DateTo'
+      responses:
+        '200':
+          description: Sale list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Sale' }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      tags: [Sales]
+      summary: Create sale header
+      description: >
+        Frontend creates the sale first, receives sale_id, then creates product-sales rows.
+        Do not require sale items in this request.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaleInput' }
+      responses:
+        '201':
+          description: Created sale. Must include sale_id.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Sale' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /sales/{sale_id}:
+    parameters:
+      - $ref: '#/components/parameters/SaleId'
+    put:
+      tags: [Sales]
+      summary: Update sale header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaleInput' }
+      responses:
+        '200':
+          description: Updated sale
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Sale' }
+        default: { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [Sales]
+      summary: Delete sale
+      description: Delete sale items too or reject deletion when items exist. If deleting items, return quantities to stock.
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /product-sales:
+    get:
+      tags: [ProductSales]
+      summary: List sale items
+      parameters:
+        - name: sale_id
+          in: query
+          schema: { type: integer }
+          description: Filter by sale. Required by frontend when opening sale items.
+        - $ref: '#/components/parameters/ProductIdQuery'
+      responses:
+        '200':
+          description: Sale item list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProductSale' }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      tags: [ProductSales]
+      summary: Create sale item
+      description: Backend should check available stock and decrease stock by quantity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductSaleInput' }
+      responses:
+        '201':
+          description: Created sale item
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductSale' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /product-sales/{product_sales_id}:
+    parameters:
+      - $ref: '#/components/parameters/ProductSalesId'
+    put:
+      tags: [ProductSales]
+      summary: Update sale item
+      description: Backend should adjust stock by difference between old and new quantity/product.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductSaleInput' }
+      responses:
+        '200':
+          description: Updated sale item
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductSale' }
+        default: { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [ProductSales]
+      summary: Delete sale item
+      description: Backend should return deleted item quantity to stock.
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /cancellations:
+    get:
+      tags: [Cancellations]
+      summary: List cancellations
+      parameters:
+        - $ref: '#/components/parameters/ProductIdQuery'
+        - $ref: '#/components/parameters/DateFrom'
+        - $ref: '#/components/parameters/DateTo'
+      responses:
+        '200':
+          description: Cancellation list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Cancellation' }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      tags: [Cancellations]
+      summary: Create cancellation
+      description: Backend should check available stock and decrease stock by quantity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CancellationInput' }
+      responses:
+        '201':
+          description: Created cancellation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cancellation' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /cancellations/{cancellation_id}:
+    parameters:
+      - $ref: '#/components/parameters/CancellationId'
+    put:
+      tags: [Cancellations]
+      summary: Update cancellation
+      description: Backend should adjust stock by difference between old and new cancellation quantity/product.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CancellationInput' }
+      responses:
+        '200':
+          description: Updated cancellation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cancellation' }
+        default: { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [Cancellations]
+      summary: Delete cancellation
+      description: Backend should return deleted cancellation quantity to stock.
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /reports/stock-in-hand:
+    get:
+      tags: [Reports]
+      summary: Report: products currently in stock
+      responses:
+        '200':
+          description: Current stock report
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/StockInHandReportRow' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /reports/supplies:
+    get:
+      tags: [Reports]
+      summary: Report: supplies for period
+      parameters:
+        - $ref: '#/components/parameters/DateFrom'
+        - $ref: '#/components/parameters/DateTo'
+      responses:
+        '200':
+          description: Supplies report
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SuppliesReportRow' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /reports/cancellations:
+    get:
+      tags: [Reports]
+      summary: Report: cancellations for period
+      parameters:
+        - $ref: '#/components/parameters/DateFrom'
+        - $ref: '#/components/parameters/DateTo'
+      responses:
+        '200':
+          description: Cancellations report
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/CancellationsReportRow' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /reports/profit:
+    get:
+      tags: [Reports]
+      summary: Report: expenses and profit for period
+      description: Return rows with indicator and amount, e.g. revenue, supply_cost, cancellation_loss, profit.
+      parameters:
+        - $ref: '#/components/parameters/DateFrom'
+        - $ref: '#/components/parameters/DateTo'
+      responses:
+        '200':
+          description: Profit report
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProfitReportRow' }
+        default: { $ref: '#/components/responses/Error' }
+
+components:
+  parameters:
+    Search:
+      name: search
+      in: query
+      schema: { type: string }
+      description: Case-insensitive partial search.
+    DateFrom:
+      name: date_from
+      in: query
+      schema: { type: string, format: date }
+      description: Inclusive lower date bound, YYYY-MM-DD.
+    DateTo:
+      name: date_to
+      in: query
+      schema: { type: string, format: date }
+      description: Inclusive upper date bound, YYYY-MM-DD.
+    TypeId:
+      name: type_id
+      in: path
+      required: true
+      schema: { type: integer }
+    ProductId:
+      name: product_id
+      in: path
+      required: true
+      schema: { type: integer }
+    ProductIdQuery:
+      name: product_id
+      in: query
+      schema: { type: integer }
+    PriceId:
+      name: price_id
+      in: path
+      required: true
+      schema: { type: integer }
+    SupplierId:
+      name: supplier_id
+      in: path
+      required: true
+      schema: { type: integer }
+    SupplyId:
+      name: supply_id
+      in: path
+      required: true
+      schema: { type: integer }
+    StockId:
+      name: stock_id
+      in: path
+      required: true
+      schema: { type: integer }
+    SaleId:
+      name: sale_id
+      in: path
+      required: true
+      schema: { type: integer }
+    ProductSalesId:
+      name: product_sales_id
+      in: path
+      required: true
+      schema: { type: integer }
+    CancellationId:
+      name: cancellation_id
+      in: path
+      required: true
+      schema: { type: integer }
+
+  responses:
+    Deleted:
+      description: Deleted successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success: { type: boolean, example: true }
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          example: Запись не найдена
+
+    ProductTypeInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, example: Молочная продукция }
+        for_adult: { type: boolean, example: false }
+    ProductType:
+      allOf:
+        - $ref: '#/components/schemas/ProductTypeInput'
+        - type: object
+          required: [type_id]
+          properties:
+            type_id: { type: integer, example: 1 }
+
+    ProductInput:
+      type: object
+      required: [type_id, name]
+      properties:
+        type_id: { type: integer, example: 1 }
+        name: { type: string, example: Молоко 3.2% }
+        manufacturer: { type: string, nullable: true, example: Простоквашино }
+        weight: { type: number, format: double, nullable: true, example: 1.0 }
+        volume: { type: number, format: double, nullable: true, example: 0.93 }
+    Product:
+      allOf:
+        - $ref: '#/components/schemas/ProductInput'
+        - type: object
+          required: [product_id]
+          properties:
+            product_id: { type: integer, example: 10 }
+            type_name: { type: string, example: Молочная продукция }
+
+    PriceInput:
+      type: object
+      required: [product_id, date_start, full_price, total_price]
+      properties:
+        product_id: { type: integer, example: 10 }
+        date_start: { type: string, format: date, example: '2026-05-01' }
+        date_end: { type: string, format: date, nullable: true, example: '2026-05-31' }
+        discount: { type: number, format: double, minimum: 0, maximum: 100, example: 10 }
+        full_price: { type: number, format: double, minimum: 0, example: 120.00 }
+        total_price: { type: number, format: double, minimum: 0, example: 108.00 }
+    Price:
+      allOf:
+        - $ref: '#/components/schemas/PriceInput'
+        - type: object
+          required: [price_id]
+          properties:
+            price_id: { type: integer, example: 100 }
+            product_name: { type: string, example: Молоко 3.2% }
+
+    SupplierInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, example: ООО Поставщик }
+        inn: { type: string, nullable: true, example: '7701234567' }
+        kpp: { type: string, nullable: true, example: '770101001' }
+        ogrn: { type: string, nullable: true, example: '1027700000000' }
+        phone: { type: string, nullable: true, example: '+7 999 123-45-67' }
+        email: { type: string, format: email, nullable: true, example: supplier@example.com }
+    Supplier:
+      allOf:
+        - $ref: '#/components/schemas/SupplierInput'
+        - type: object
+          required: [supplier_id]
+          properties:
+            supplier_id: { type: integer, example: 5 }
+
+    ProductSupplyInput:
+      type: object
+      required: [product_id, supplier_id]
+      properties:
+        product_id: { type: integer, example: 10 }
+        supplier_id: { type: integer, example: 5 }
+        price: { type: number, format: double, minimum: 0, example: 80.00 }
+        quantity: { type: number, format: double, minimum: 0, example: 20 }
+        delivery_date: { type: string, format: date, nullable: true, example: '2026-05-10' }
+    ProductSupply:
+      allOf:
+        - $ref: '#/components/schemas/ProductSupplyInput'
+        - type: object
+          required: [supply_id]
+          properties:
+            supply_id: { type: integer, example: 200 }
+            product_name: { type: string, example: Молоко 3.2% }
+            supplier_name: { type: string, example: ООО Поставщик }
+
+    StockInput:
+      type: object
+      required: [product_id]
+      properties:
+        product_id: { type: integer, example: 10 }
+        quantity: { type: number, format: double, minimum: 0, example: 15.5 }
+    Stock:
+      allOf:
+        - $ref: '#/components/schemas/StockInput'
+        - type: object
+          required: [stock_id]
+          properties:
+            stock_id: { type: integer, example: 300 }
+            product_name: { type: string, example: Молоко 3.2% }
+
+    SaleInput:
+      type: object
+      required: [datetime, full_cost, total_cost]
+      properties:
+        datetime:
+          type: string
+          description: Frontend sends datetime-local value. Accept YYYY-MM-DDTHH:mm.
+          example: '2026-05-26T14:30'
+        discount: { type: number, format: double, minimum: 0, maximum: 100, example: 5 }
+        full_cost: { type: number, format: double, minimum: 0, example: 500.00 }
+        total_cost: { type: number, format: double, minimum: 0, example: 475.00 }
+    Sale:
+      allOf:
+        - $ref: '#/components/schemas/SaleInput'
+        - type: object
+          required: [sale_id]
+          properties:
+            sale_id: { type: integer, example: 400 }
+
+    ProductSaleInput:
+      type: object
+      required: [sale_id, product_id]
+      properties:
+        sale_id: { type: integer, example: 400 }
+        product_id: { type: integer, example: 10 }
+        sale_price: { type: number, format: double, minimum: 0, example: 108.00 }
+        quantity: { type: number, format: double, minimum: 0.001, example: 2 }
+    ProductSale:
+      allOf:
+        - $ref: '#/components/schemas/ProductSaleInput'
+        - type: object
+          required: [product_sales_id]
+          properties:
+            product_sales_id: { type: integer, example: 500 }
+            sale_datetime: { type: string, example: '2026-05-26T14:30' }
+            product_name: { type: string, example: Молоко 3.2% }
+
+    CancellationInput:
+      type: object
+      required: [datetime, product_id]
+      properties:
+        datetime:
+          type: string
+          description: Frontend sends datetime-local value. Accept YYYY-MM-DDTHH:mm.
+          example: '2026-05-26T15:00'
+        product_id: { type: integer, example: 10 }
+        quantity: { type: number, format: double, minimum: 0.001, example: 1 }
+    Cancellation:
+      allOf:
+        - $ref: '#/components/schemas/CancellationInput'
+        - type: object
+          required: [cancellation_id]
+          properties:
+            cancellation_id: { type: integer, example: 600 }
+            product_name: { type: string, example: Молоко 3.2% }
+
+    StockInHandReportRow:
+      type: object
+      properties:
+        product_name: { type: string, example: Молоко 3.2% }
+        type_name: { type: string, example: Молочная продукция }
+        manufacturer: { type: string, nullable: true, example: Простоквашино }
+        quantity: { type: number, format: double, example: 15 }
+        current_price: { type: number, format: double, example: 108.00 }
+        stock_value: { type: number, format: double, example: 1620.00 }
+
+    SuppliesReportRow:
+      type: object
+      properties:
+        delivery_date: { type: string, format: date, example: '2026-05-10' }
+        product_name: { type: string, example: Молоко 3.2% }
+        supplier_name: { type: string, example: ООО Поставщик }
+        price: { type: number, format: double, example: 80.00 }
+        quantity: { type: number, format: double, example: 20 }
+        total_supply_cost: { type: number, format: double, example: 1600.00 }
+
+    CancellationsReportRow:
+      type: object
+      properties:
+        datetime: { type: string, example: '2026-05-26T15:00' }
+        product_name: { type: string, example: Молоко 3.2% }
+        quantity: { type: number, format: double, example: 1 }
+        estimated_price: { type: number, format: double, example: 108.00 }
+        estimated_loss: { type: number, format: double, example: 108.00 }
+
+    ProfitReportRow:
+      type: object
+      properties:
+        indicator:
+          type: string
+          example: Выручка от продаж
+        amount:
+          type: number
+          format: double
+          example: 25000.00
