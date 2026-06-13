@@ -3,18 +3,21 @@ package gorm
 import (
 	"context"
 	"strings"
+
+	"gorm.io/gorm"
+
 	"supermarket/internal/models"
 	base "supermarket/internal/repository/gorm"
 	productType "supermarket/internal/repository/product_type"
-
-	"gorm.io/gorm"
 )
 
 type repository struct {
 	*base.Repository[models.ProductType]
+
 	db *gorm.DB
 }
 
+// New create gorm repository for product types.
 func New(db *gorm.DB) productType.Repository {
 	return repository{
 		Repository: base.New[models.ProductType](db),

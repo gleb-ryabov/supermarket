@@ -2,9 +2,10 @@ package producttype
 
 import (
 	"context"
-	"supermarket/internal/models"
 
 	"github.com/google/uuid"
+
+	"supermarket/internal/models"
 )
 
 // Service  provides business logic for product types.
@@ -15,6 +16,6 @@ type Service interface {
 	CreateProductType(ctx context.Context, pt *models.ProductType) error
 	// DeleteProductType deletes product type in the db by id.
 	DeleteProductType(ctx context.Context, id uuid.UUID) error
-	// CreateProductType updates product type in the db.
+	// UpdateProductType updates product type in the db.
 	UpdateProductType(ctx context.Context, pt *models.ProductType) error
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// Product represents a concrete item in the catalog that can be sold or supplied.
 type Product struct {
 	ID           uuid.UUID       `gorm:"column:product_id;type:uuid;primaryKey"`
 	TypeID       uuid.UUID       `gorm:"column:type_id;type:uuid;not null"`
@@ -14,6 +15,7 @@ type Product struct {
 	Volume       decimal.Decimal `gorm:"column:volume;type:decimal(12,3)"`
 }
 
+// TableName returns table name from db.
 func (Product) TableName() string {
 	return "products"
 }

@@ -4,13 +4,16 @@ import (
 	"context"
 	"log/slog"
 	"strconv"
-	"supermarket/internal/models"
-	producttype "supermarket/internal/services/product_type"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+
+	"supermarket/internal/models"
+	producttype "supermarket/internal/services/product_type"
 )
+
+// TODO: add swagger doc
 
 // Handler is http request handler for product types.
 type Handler struct {
@@ -40,6 +43,7 @@ func New(
 	}
 }
 
+// GetProductTypes handles HTTP GET request for retrieving product types list.
 func (h *Handler) GetProductTypes(c *fiber.Ctx) error {
 	const op = "http.handlers.product_types.getProductTypes"
 
@@ -79,6 +83,7 @@ func (h *Handler) GetProductTypes(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(result)
 }
 
+// CreateProductType handles HTTP POST request for create product in system.
 func (h *Handler) CreateProductType(c *fiber.Ctx) error {
 	const op = "http.handlers.product_types.createProductType"
 
@@ -106,6 +111,7 @@ func (h *Handler) CreateProductType(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(pt)
 }
 
+// DeleteProductType handles HTTP DELETE request for delete product in system.
 func (h *Handler) DeleteProductType(c *fiber.Ctx) error {
 	op := "http.handlers.product_types.deleteProductType"
 
@@ -133,6 +139,7 @@ func (h *Handler) DeleteProductType(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).SendString("success")
 }
 
+// UpdateProductType handles HTTP DELETE request for update product in system.
 func (h *Handler) UpdateProductType(c *fiber.Ctx) error {
 	op := "http.handlers.product_types.updateProductType"
 
@@ -150,7 +157,7 @@ func (h *Handler) UpdateProductType(c *fiber.Ctx) error {
 	}
 
 	var pt models.ProductType
-	if err := c.BodyParser(&pt); err != nil {
+	if err = c.BodyParser(&pt); err != nil {
 		log.Error("failed to parse body", slog.Any("body", c.Body()), slog.Any("error", err))
 
 		return c.Status(fiber.StatusBadRequest).SendString("invalid request body")
@@ -159,7 +166,12 @@ func (h *Handler) UpdateProductType(c *fiber.Ctx) error {
 	pt.ID = id
 
 	if err = h.productTypesS.UpdateProductType(ctx, &pt); err != nil {
-		log.Error("failed to update product type", slog.Any("id", id), slog.Any("productType", pt), slog.Any("error", err))
+		log.Error(
+			"failed to update product type",
+			slog.Any("id", id),
+			slog.Any("productType", pt),
+			slog.Any("error", err),
+		)
 
 		return c.Status(fiber.StatusInternalServerError).SendString("failed update product type")
 	}

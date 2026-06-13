@@ -7,6 +7,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// Cancellation represents a cancellation event of a product in the system.
 type Cancellation struct {
 	ID        uuid.UUID       `gorm:"column:cancellation_id;type:uuid;primaryKey"`
 	DateTime  time.Time       `gorm:"column:datetime;type:timestamp;not null"`
@@ -14,6 +15,7 @@ type Cancellation struct {
 	Quantity  decimal.Decimal `gorm:"column:quantity;type:decimal(12,3)"`
 }
 
+// TableName returns table name from db.
 func (Cancellation) TableName() string {
 	return "cancellation"
 }

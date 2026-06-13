@@ -7,6 +7,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// Sale represents a completed purchase transaction in the system.
 type Sale struct {
 	ID        uuid.UUID       `gorm:"column:sale_id;type:uuid;primaryKey"`
 	DateTime  time.Time       `gorm:"column:datetime;type:timestamp;not null"`
@@ -15,6 +16,7 @@ type Sale struct {
 	TotalCost decimal.Decimal `gorm:"column:total_cost;type:decimal(10,2);not null"`
 }
 
+// TableName returns table name from db.
 func (Sale) TableName() string {
 	return "sales"
 }

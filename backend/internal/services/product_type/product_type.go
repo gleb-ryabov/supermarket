@@ -3,10 +3,11 @@ package producttype
 import (
 	"context"
 	"log/slog"
-	"supermarket/internal/models"
-	producttype "supermarket/internal/repository/product_type"
 
 	"github.com/google/uuid"
+
+	"supermarket/internal/models"
+	producttype "supermarket/internal/repository/product_type"
 )
 
 // service provides business logic for product types.

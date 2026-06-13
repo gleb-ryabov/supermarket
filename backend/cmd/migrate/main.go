@@ -3,13 +3,14 @@ package main
 import (
 	"errors"
 	"log/slog"
-	"supermarket/internal/config"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/spf13/viper"
 
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+
+	"supermarket/internal/config"
 )
 
 func main() {
@@ -26,16 +27,19 @@ func main() {
 	)
 	if err != nil {
 		slog.Error("failed to initialize migrations", slog.Any("error", err))
+
 		return
 	}
 
-	if err := m.Up(); err != nil {
+	if err = m.Up(); err != nil {
 		if errors.Is(err, migrate.ErrNoChange) {
 			slog.Info("no migrations to apply")
+
 			return
 		}
 
 		slog.Error("failed to apply migrations", slog.Any("error", err))
+
 		return
 	}
 

@@ -8,6 +8,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
+	"github.com/spf13/viper"
+
 	"supermarket/internal/config"
 	producttypeH "supermarket/internal/http/handlers/product_type"
 	"supermarket/internal/http/router"
@@ -15,9 +18,6 @@ import (
 	producttypeR "supermarket/internal/repository/product_type/gorm"
 	producttypeS "supermarket/internal/services/product_type"
 	"supermarket/internal/storage/postgres"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/spf13/viper"
 )
 
 func main() {
@@ -63,8 +63,13 @@ func main() {
 	productTypeS := producttypeS.New(l, productTypeR)
 
 	//handler
-	//todo: set timeout from config
-	productTypeH := producttypeH.New(l, time.Second*10, time.Second*10, productTypeS)
+	// TODO: set timeout from config
+	productTypeH := producttypeH.New(
+		l,
+		time.Second*time.Duration(viper.GetInt(config.ReadTimeout)),
+		time.Second*time.Duration(viper.GetInt(config.WriteTimeout)),
+		productTypeS,
+	)
 
 	//server
 	app := fiber.New(fiber.Config{})

@@ -9,6 +9,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	defaultReadTimeout  = 10
+	defaultWriteTimeout = 10
+)
+
 var (
 	errConfigNotFound = errors.New("configuration file not found")
 )
@@ -46,6 +51,8 @@ func setDefaultsConfig() {
 	viper.SetDefault(DBSSL, "disable")
 	viper.SetDefault(HTTPAddress, "localhost")
 	viper.SetDefault(HTTPPort, "8080")
+	viper.SetDefault(ReadTimeout, defaultReadTimeout)
+	viper.SetDefault(WriteTimeout, defaultWriteTimeout)
 }
 
 // GetPostgresDSN - return url for connect to PostgreSQL.
