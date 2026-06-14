@@ -39,6 +39,9 @@ func (r repository) GetByParams(ctx context.Context, name string, forAdult *bool
 	}
 
 	err := q.Find(&pt).Error
+	if err != nil {
+		return nil, err
+	}
 
 	return pt, err
 }

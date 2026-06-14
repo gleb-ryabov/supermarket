@@ -39,7 +39,7 @@ func (s *service) GetProductTypes(ctx context.Context, name string, forAdult *bo
 		log.Error("failed to get product types",
 			slog.Any("error", err),
 			slog.String("name", name),
-			slog.Any("for_adult", *forAdult),
+			slog.Any("for_adult", forAdult),
 		)
 
 		return nil, err
@@ -50,7 +50,7 @@ func (s *service) GetProductTypes(ctx context.Context, name string, forAdult *bo
 
 // CreateProductType creates product type in the db.
 func (s *service) CreateProductType(ctx context.Context, pt *models.ProductType) error {
-	const op = "services.product_types.createProductTypes"
+	const op = "services.product_types.createProductType"
 
 	log := s.logger.With("op", op)
 
@@ -70,7 +70,7 @@ func (s *service) CreateProductType(ctx context.Context, pt *models.ProductType)
 
 // DeleteProductType deletes product type in the db by id.
 func (s *service) DeleteProductType(ctx context.Context, id uuid.UUID) error {
-	const op = "services.product_types.deleteProductTypes"
+	const op = "services.product_types.deleteProductType"
 
 	log := s.logger.With("op", op)
 
@@ -88,7 +88,7 @@ func (s *service) DeleteProductType(ctx context.Context, id uuid.UUID) error {
 
 // UpdateProductType deletes product type in the db by id.
 func (s *service) UpdateProductType(ctx context.Context, pt *models.ProductType) error {
-	const op = "services.product_types.updateProductTypes"
+	const op = "services.product_types.updateProductType"
 
 	log := s.logger.With("op", op)
 

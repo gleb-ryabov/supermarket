@@ -63,7 +63,6 @@ func main() {
 	productTypeS := producttypeS.New(l, productTypeR)
 
 	//handler
-	// TODO: set timeout from config
 	productTypeH := producttypeH.New(
 		l,
 		time.Second*time.Duration(viper.GetInt(config.ReadTimeout)),

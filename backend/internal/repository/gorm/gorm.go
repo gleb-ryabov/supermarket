@@ -49,5 +49,5 @@ func (r Repository[T]) Update(ctx context.Context, t *T) error {
 func (r Repository[T]) Delete(ctx context.Context, id uuid.UUID) error {
 	var item T
 
-	return r.db.WithContext(ctx).Delete(item, id).Error
+	return r.db.WithContext(ctx).Delete(&item, id).Error
 }
