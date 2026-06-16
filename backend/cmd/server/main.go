@@ -12,11 +12,14 @@ import (
 	"github.com/spf13/viper"
 
 	"supermarket/internal/config"
-	producttypeH "supermarket/internal/http/handlers/product_type"
+	productHandler "supermarket/internal/http/handlers/product"
+	producttypeHandler "supermarket/internal/http/handlers/product_type"
 	"supermarket/internal/http/router"
 	"supermarket/internal/logger"
-	producttypeR "supermarket/internal/repository/product_type/gorm"
-	producttypeS "supermarket/internal/services/product_type"
+	productRepo "supermarket/internal/repository/product/gorm"
+	producttypeRepo "supermarket/internal/repository/product_type/gorm"
+	productService "supermarket/internal/services/product"
+	producttypeService "supermarket/internal/services/product_type"
 	"supermarket/internal/storage/postgres"
 )
 
@@ -57,22 +60,30 @@ func main() {
 	l.Info("db connected")
 
 	//repo
-	productTypeR := producttypeR.New(db.DB)
+	productTypeR := producttypeRepo.New(db.DB)
+	productR := productRepo.New(db.DB)
 
 	//service
-	productTypeS := producttypeS.New(l, productTypeR)
+	productTypeS := producttypeService.New(l, productTypeR)
+	productS := productService.New(l, productR)
 
 	//handler
-	productTypeH := producttypeH.New(
+	productTypeH := producttypeHandler.New(
 		l,
 		time.Second*time.Duration(viper.GetInt(config.ReadTimeout)),
 		time.Second*time.Duration(viper.GetInt(config.WriteTimeout)),
 		productTypeS,
 	)
+	productH := productHandler.New(
+		l,
+		time.Second*time.Duration(viper.GetInt(config.ReadTimeout)),
+		time.Second*time.Duration(viper.GetInt(config.WriteTimeout)),
+		productS,
+	)
 
 	//server
 	app := fiber.New(fiber.Config{})
-	router.New(app, productTypeH).Setup()
+	router.New(app, productTypeH, productH).Setup()
 
 	adr := config.GetServerURL()
 	go func() {

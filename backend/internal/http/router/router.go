@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 
+	"supermarket/internal/http/handlers/product"
 	producttype "supermarket/internal/http/handlers/product_type"
 )
 
@@ -15,16 +16,19 @@ type Router struct {
 	app *fiber.App
 
 	productType *producttype.Handler
+	product     *product.Handler
 }
 
 // New creates http router.
 func New(
 	app *fiber.App,
 	productType *producttype.Handler,
+	product *product.Handler,
 ) *Router {
 	return &Router{
 		app:         app,
 		productType: productType,
+		product:     product,
 	}
 }
 
@@ -35,14 +39,19 @@ func (r *Router) Setup() {
 	r.app.Use(logger.New())
 	r.app.Use(cors.New())
 
-	productTypes := r.app.Group("api/product-types")
+	api := r.app.Group("api")
+
+	productTypes := api.Group("product-types")
 	productTypes.Get("/", r.productType.GetProductTypes)
 	productTypes.Post("/", r.productType.CreateProductType)
 	productTypes.Delete("/:id", r.productType.DeleteProductType)
 	productTypes.Put("/:id", r.productType.UpdateProductType)
 
-	products := r.app.Group("/products")
-	_ = products
+	products := api.Group("products")
+	products.Get("/", r.product.GetProducts)
+	products.Post("/", r.product.CreateProduct)
+	products.Delete("/:id", r.product.DeleteProduct)
+	products.Put("/:id", r.product.UpdateProduct)
 
 	prices := r.app.Group("/prices")
 	_ = prices

@@ -29,17 +29,14 @@ type Handler struct {
 // New creates handler for product types.
 func New(
 	logger *slog.Logger,
-
 	readTimeout time.Duration,
 	writeTimeout time.Duration,
-
 	productTypeS producttype.Service,
 ) *Handler {
 	return &Handler{
-		logger:       logger,
-		readTimeout:  readTimeout,
-		writeTimeout: writeTimeout,
-
+		logger:        logger,
+		readTimeout:   readTimeout,
+		writeTimeout:  writeTimeout,
 		productTypesS: productTypeS,
 	}
 }
@@ -78,7 +75,7 @@ func (h *Handler) GetProductTypes(c *fiber.Ctx) error {
 	return resp.Respond(c, fiber.StatusOK, result)
 }
 
-// CreateProductType handles HTTP POST request for create product in system.
+// CreateProductType handles HTTP POST request for create product type in system.
 func (h *Handler) CreateProductType(c *fiber.Ctx) error {
 	const op = "http.handlers.product_types.createProductType"
 
@@ -104,7 +101,7 @@ func (h *Handler) CreateProductType(c *fiber.Ctx) error {
 	return resp.Respond(c, fiber.StatusCreated, pt)
 }
 
-// DeleteProductType handles HTTP DELETE request for delete product in system.
+// DeleteProductType handles HTTP DELETE request for delete product type in system.
 func (h *Handler) DeleteProductType(c *fiber.Ctx) error {
 	op := "http.handlers.product_types.deleteProductType"
 
@@ -130,7 +127,7 @@ func (h *Handler) DeleteProductType(c *fiber.Ctx) error {
 	return resp.Respond(c, fiber.StatusOK, resp.OK())
 }
 
-// UpdateProductType handles HTTP PUT request for update product in system.
+// UpdateProductType handles HTTP PUT request for update product type in system.
 func (h *Handler) UpdateProductType(c *fiber.Ctx) error {
 	op := "http.handlers.product_types.updateProductType"
 
