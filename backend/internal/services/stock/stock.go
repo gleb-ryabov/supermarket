@@ -2,12 +2,15 @@ package stock
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"github.com/google/uuid"
 
 	"supermarket/internal/models"
+	"supermarket/internal/repository"
 	"supermarket/internal/repository/stock"
+	"supermarket/internal/services"
 )
 
 // service provides business logic for stocks.
@@ -46,4 +49,33 @@ func (s *service) GetStocks(ctx context.Context, search string, productID *uuid.
 	}
 
 	return stocks, err
+}
+
+// UpdateCountStock updates the quantity of a stock item by its ID. Sets += for count.
+func (s *service) UpdateCountStock(ctx context.Context, id uuid.UUID, count int) error {
+	const op = "services.stocks.updateCountStock"
+
+	log := s.logger.With("op", op)
+
+	err := s.stocksR.UpdateCount(ctx, id, count)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotEnoughStock) {
+			log.Error("Not enough stock quantity",
+				slog.Any("id", id),
+				slog.Int("count", count),
+			)
+
+			return services.ErrNotEnoughStock
+		}
+
+		log.Error("failed to update count stock",
+			slog.Any("error", err),
+			slog.Any("id", id),
+			slog.Int("count", count),
+		)
+
+		return err
+	}
+
+	return nil
 }

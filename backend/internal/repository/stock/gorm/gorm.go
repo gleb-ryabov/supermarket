@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 
 	"supermarket/internal/models"
+	repo "supermarket/internal/repository"
 	base "supermarket/internal/repository/gorm"
 	"supermarket/internal/repository/stock"
 )
@@ -46,4 +47,23 @@ func (r *repository) GetByParams(ctx context.Context, search string, productID *
 	}
 
 	return s, nil
+}
+
+// UpdateCount updates the quantity of a stock item by its ID.
+func (r *repository) UpdateCount(ctx context.Context, id uuid.UUID, count int) error {
+	result := r.db.WithContext(ctx).
+		Model(&models.Stock{}).
+		Where("stock_id = ?", id).
+		Where("quantity >= ?", count).
+		Update("quantity", gorm.Expr("quantity + ?", count))
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return repo.ErrNotEnoughStock
+	}
+
+	return nil
 }
