@@ -19,14 +19,14 @@ type repository struct {
 
 // New create gorm repository for suppliers.
 func New(db *gorm.DB) supplier.Repository {
-	return repository{
+	return &repository{
 		Repository: base.New[models.Supplier](db),
 		db:         db,
 	}
 }
 
 // GetByParams returns suppliers by search param.
-func (r repository) GetByParams(ctx context.Context, search string) ([]models.Supplier, error) {
+func (r *repository) GetByParams(ctx context.Context, search string) ([]models.Supplier, error) {
 	var p []models.Supplier
 
 	q := r.db.WithContext(ctx)

@@ -20,14 +20,14 @@ type repository struct {
 
 // New create gorm repository for prices.
 func New(db *gorm.DB) price.Repository {
-	return repository{
+	return &repository{
 		Repository: base.New[models.Price](db),
 		db:         db,
 	}
 }
 
 // GetByParams returns prices by params.
-func (r repository) GetByParams(
+func (r *repository) GetByParams(
 	ctx context.Context,
 	typeID *uuid.UUID,
 	dateFrom *time.Time,

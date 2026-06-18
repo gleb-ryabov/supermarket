@@ -20,7 +20,7 @@ func New[T any](db *gorm.DB) *Repository[T] {
 }
 
 // GetAll returns all items from db.
-func (r Repository[T]) GetAll(ctx context.Context) ([]*T, error) {
+func (r *Repository[T]) GetAll(ctx context.Context) ([]*T, error) {
 	var items []*T
 	err := r.db.WithContext(ctx).Find(&items).Error
 
@@ -28,7 +28,7 @@ func (r Repository[T]) GetAll(ctx context.Context) ([]*T, error) {
 }
 
 // GetByID returns item by id from db.
-func (r Repository[T]) GetByID(ctx context.Context, id uuid.UUID) (*T, error) {
+func (r *Repository[T]) GetByID(ctx context.Context, id uuid.UUID) (*T, error) {
 	var item T
 	err := r.db.WithContext(ctx).First(&item, id).Error
 
@@ -36,17 +36,17 @@ func (r Repository[T]) GetByID(ctx context.Context, id uuid.UUID) (*T, error) {
 }
 
 // Create makes item in the db.
-func (r Repository[T]) Create(ctx context.Context, t *T) error {
+func (r *Repository[T]) Create(ctx context.Context, t *T) error {
 	return r.db.WithContext(ctx).Create(t).Error
 }
 
 // Update replaces item in the db.
-func (r Repository[T]) Update(ctx context.Context, t *T) error {
+func (r *Repository[T]) Update(ctx context.Context, t *T) error {
 	return r.db.WithContext(ctx).Model(t).Updates(t).Error
 }
 
 // Delete drops item in the db.
-func (r Repository[T]) Delete(ctx context.Context, id uuid.UUID) error {
+func (r *Repository[T]) Delete(ctx context.Context, id uuid.UUID) error {
 	var item T
 
 	return r.db.WithContext(ctx).Delete(&item, id).Error

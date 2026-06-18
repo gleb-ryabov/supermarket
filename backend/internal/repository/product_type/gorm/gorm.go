@@ -19,13 +19,13 @@ type repository struct {
 
 // New create gorm repository for product types.
 func New(db *gorm.DB) productType.Repository {
-	return repository{
+	return &repository{
 		Repository: base.New[models.ProductType](db),
 		db:         db,
 	}
 }
 
-func (r repository) GetByParams(ctx context.Context, name string, forAdult *bool) ([]models.ProductType, error) {
+func (r *repository) GetByParams(ctx context.Context, name string, forAdult *bool) ([]models.ProductType, error) {
 	var pt []models.ProductType
 
 	q := r.db.WithContext(ctx)
