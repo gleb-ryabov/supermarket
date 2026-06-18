@@ -18,7 +18,7 @@ func (a *App) Run(addr string) error {
 	return a.app.Listen(addr)
 }
 
-// Run stops server.
+// Shutdown stops server.
 func (a *App) Shutdown(ctx context.Context) error {
 	return a.app.ShutdownWithContext(ctx)
 }

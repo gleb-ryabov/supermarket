@@ -27,14 +27,14 @@ func main() {
 	}
 
 	go func() {
-		if err := appl.Run(config.GetServerURL()); err != nil {
+		if err = appl.Run(config.GetServerURL()); err != nil {
 			slog.Error("run server failed", slog.Any("error", err))
 		}
 	}()
 
 	<-ctx.Done()
 	slog.Info("shutdown signal received")
-	if err := appl.Shutdown(ctx); err != nil {
+	if err = appl.Shutdown(ctx); err != nil {
 		slog.Error("shutdown server failed", slog.Any("error", err))
 	}
 }

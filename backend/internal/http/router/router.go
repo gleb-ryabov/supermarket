@@ -10,6 +10,7 @@ import (
 	"supermarket/internal/http/handlers/price"
 	"supermarket/internal/http/handlers/product"
 	producttype "supermarket/internal/http/handlers/product_type"
+	"supermarket/internal/http/handlers/stock"
 	"supermarket/internal/http/handlers/supplier"
 )
 
@@ -21,6 +22,7 @@ type Router struct {
 	product     *product.Handler
 	price       *price.Handler
 	supplier    *supplier.Handler
+	stock       *stock.Handler
 }
 
 // New creates http router.
@@ -30,6 +32,7 @@ func New(
 	product *product.Handler,
 	price *price.Handler,
 	supplier *supplier.Handler,
+	stock *stock.Handler,
 ) *Router {
 	return &Router{
 		app:         app,
@@ -37,6 +40,7 @@ func New(
 		product:     product,
 		price:       price,
 		supplier:    supplier,
+		stock:       stock,
 	}
 }
 
@@ -73,11 +77,11 @@ func (r *Router) Setup() {
 	suppliers.Delete("/:id", r.supplier.DeleteSupplier)
 	suppliers.Put("/:id", r.supplier.UpdateSupplier)
 
+	stock := api.Group("/stock")
+	stock.Get("/", r.stock.GetStocks)
+
 	productSupplies := r.app.Group("/product-supplies")
 	_ = productSupplies
-
-	stock := r.app.Group("/stock")
-	_ = stock
 
 	sales := r.app.Group("/sales")
 	_ = sales
