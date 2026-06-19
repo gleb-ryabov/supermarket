@@ -14,6 +14,8 @@ type Repository interface {
 	repository.Repository[models.Stock]
 	// GetByParams returns stocks by search param.
 	GetByParams(ctx context.Context, search string, productID *uuid.UUID) ([]models.Stock, error)
-	// UpdateCount updates the quantity of a stock item by its ID.
-	UpdateCount(ctx context.Context, id uuid.UUID, count int) error
+	// SetCountByProductID updates the quantity of a stock item by product ID.
+	SetCountByProductID(ctx context.Context, productID uuid.UUID, count int) error
+	// FirstOrCreateByProductID finds the stock by product ID, otherwise if not found creates a new stock.
+	FirstOrCreateByProductID(ctx context.Context, productID uuid.UUID) (*models.Stock, error)
 }

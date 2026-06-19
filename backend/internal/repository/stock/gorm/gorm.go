@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 
 	"supermarket/internal/models"
@@ -49,11 +50,11 @@ func (r *repository) GetByParams(ctx context.Context, search string, productID *
 	return s, nil
 }
 
-// UpdateCount updates the quantity of a stock item by its ID.
-func (r *repository) UpdateCount(ctx context.Context, id uuid.UUID, count int) error {
+// SetCountByProductID updates the quantity of a stock item by its ID.
+func (r *repository) SetCountByProductID(ctx context.Context, productID uuid.UUID, count int) error {
 	result := r.db.WithContext(ctx).
 		Model(&models.Stock{}).
-		Where("stock_id = ?", id).
+		Where("product_id = ?", productID).
 		Where("quantity >= ?", count).
 		Update("quantity", gorm.Expr("quantity + ?", count))
 
@@ -66,4 +67,22 @@ func (r *repository) UpdateCount(ctx context.Context, id uuid.UUID, count int) e
 	}
 
 	return nil
+}
+
+// FirstOrCreateByProductID finds the stock by product ID, otherwise if not found creates a new stock.
+func (r *repository) FirstOrCreateByProductID(ctx context.Context, productID uuid.UUID) (*models.Stock, error) {
+	s := models.Stock{
+		ID:        uuid.New(),
+		ProductID: &productID,
+		Quantity:  decimal.NewFromInt(0),
+	}
+
+	err := r.db.WithContext(ctx).
+		Where("product_id = ?", productID).
+		FirstOrCreate(&s).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &s, err
 }
