@@ -51,7 +51,7 @@ func (r *repository) GetByParams(ctx context.Context, search string, productID *
 }
 
 // SetCountByProductID updates the quantity of a stock item by its ID.
-func (r *repository) SetCountByProductID(ctx context.Context, productID uuid.UUID, count int) error {
+func (r *repository) SetCountByProductID(ctx context.Context, productID uuid.UUID, count decimal.Decimal) error {
 	result := r.db.WithContext(ctx).
 		Model(&models.Stock{}).
 		Where("product_id = ?", productID).

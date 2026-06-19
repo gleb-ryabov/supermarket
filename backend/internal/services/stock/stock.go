@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 
 	"supermarket/internal/models"
 	"supermarket/internal/repository"
@@ -53,7 +54,7 @@ func (s *service) GetStocks(ctx context.Context, search string, productID *uuid.
 
 // SetCountStock updates the quantity of a stock item by its product id. Sets += for count.
 // If not found creates a new item.
-func (s *service) SetCountStock(ctx context.Context, productID uuid.UUID, count int) error {
+func (s *service) SetCountStock(ctx context.Context, productID uuid.UUID, count decimal.Decimal) error {
 	const op = "services.stocks.setCountStock"
 
 	log := s.logger.
