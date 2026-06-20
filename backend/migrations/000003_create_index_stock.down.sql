@@ -1,0 +1,1 @@
+DROP INDEX ux_stock_product_id;

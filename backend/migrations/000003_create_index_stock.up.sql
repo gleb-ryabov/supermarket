@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX ux_stock_product_id ON stock(product_id);
