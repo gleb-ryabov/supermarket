@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 
+	"supermarket/internal/lib/api/request"
 	resp "supermarket/internal/lib/api/response"
 	"supermarket/internal/services/stock"
 )
@@ -49,20 +49,11 @@ func (h *Handler) GetStocks(c *fiber.Ctx) error {
 	log := h.logger.With("op", op).With("ip", c.IP())
 	log.Debug("incoming request")
 
-	var productID *uuid.UUID
-	productIDStr := c.Query("product_id")
-	if productIDStr != "" {
-		v, err := uuid.Parse(productIDStr)
-		if err != nil {
-			log.Error(
-				"failed to parse product_id to uuid",
-				slog.Any("error", err),
-				slog.String("productID", productIDStr),
-			)
+	productID, err := request.ParseQueryToUUID(c, "product_id")
+	if err != nil {
+		log.Error("failed to parse product_id to uuid", slog.Any("error", err))
 
-			return resp.Respond(c, fiber.StatusBadRequest, resp.Error("invalid product_id"))
-		}
-		productID = &v
+		return resp.Respond(c, fiber.StatusBadRequest, resp.Error("invalid product_id"))
 	}
 	searchParam := c.Query("search")
 

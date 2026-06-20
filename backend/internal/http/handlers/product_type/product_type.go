@@ -3,12 +3,12 @@ package producttypes
 import (
 	"context"
 	"log/slog"
-	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 
+	"supermarket/internal/lib/api/request"
 	resp "supermarket/internal/lib/api/response"
 	"supermarket/internal/models"
 	producttype "supermarket/internal/services/product_type"
@@ -51,17 +51,11 @@ func (h *Handler) GetProductTypes(c *fiber.Ctx) error {
 	log := h.logger.With("op", op).With("ip", c.IP())
 	log.Debug("incoming request")
 
-	forAdultStr := c.Query("for_adult")
-	var forAdult *bool
-	if forAdultStr != "" {
-		v, err := strconv.ParseBool(forAdultStr)
-		if err != nil {
-			log.Error("failed to parse for_adult to bool", slog.Any("error", err))
+	forAdult, err := request.ParseQueryToBool(c, "for_adult")
+	if err != nil {
+		log.Error("failed to parse for_adult to bool", slog.Any("error", err))
 
-			return resp.Respond(c, fiber.StatusBadRequest, resp.Error("invalid for_adult"))
-		}
-
-		forAdult = &v
+		return resp.Respond(c, fiber.StatusBadRequest, resp.Error("invalid for_adult"))
 	}
 	searchParam := c.Query("search")
 

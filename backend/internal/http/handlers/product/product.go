@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 
+	"supermarket/internal/lib/api/request"
 	resp "supermarket/internal/lib/api/response"
 	"supermarket/internal/models"
 	"supermarket/internal/services/product"
@@ -50,16 +51,11 @@ func (h *Handler) GetProducts(c *fiber.Ctx) error {
 	log := h.logger.With("op", op).With("ip", c.IP())
 	log.Debug("incoming request")
 
-	var typeID *uuid.UUID
-	typeIDStr := c.Query("type_id")
-	if typeIDStr != "" {
-		v, err := uuid.Parse(typeIDStr)
-		if err != nil {
-			log.Error("failed to parse type_id to uuid", slog.Any("error", err), slog.String("typeId", typeIDStr))
+	typeID, err := request.ParseQueryToUUID(c, "type_id")
+	if err != nil {
+		log.Error("failed to parse type_id to uuid", slog.Any("error", err))
 
-			return resp.Respond(c, fiber.StatusBadRequest, resp.Error("invalid type_id"))
-		}
-		typeID = &v
+		return resp.Respond(c, fiber.StatusBadRequest, resp.Error("invalid type_id"))
 	}
 	searchParam := c.Query("search")
 

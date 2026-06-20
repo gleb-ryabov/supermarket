@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 
+	"supermarket/internal/lib/api/request"
 	resp "supermarket/internal/lib/api/response"
 	"supermarket/internal/models"
 	"supermarket/internal/services/price"
@@ -52,44 +53,25 @@ func (h *Handler) GetPrices(c *fiber.Ctx) error {
 	log := h.logger.With("op", op).With("ip", c.IP())
 	log.Debug("incoming request")
 
-	var typeID *uuid.UUID
-	typeIDStr := c.Query("type_id")
-	if typeIDStr != "" {
-		v, err := uuid.Parse(typeIDStr)
-		if err != nil {
-			log.Error("failed to parse type_id to uuid", slog.Any("error", err), slog.String("typeId", typeIDStr))
+	typeID, err := request.ParseQueryToUUID(c, "type_id")
+	if err != nil {
+		log.Error("failed to parse type_id to uuid", slog.Any("error", err))
 
-			return resp.Respond(c, fiber.StatusBadRequest, resp.Error("invalid type_id"))
-		}
-		typeID = &v
+		return resp.Respond(c, fiber.StatusBadRequest, resp.Error("invalid type_id"))
 	}
 
-	var dateFrom *time.Time
-	dateFromStr := c.Query("date_from")
-	if dateFromStr != "" {
-		v, err := time.Parse(layoutDate, dateFromStr)
-		if err != nil {
-			log.Error(
-				"failed to parse date_from to time.Time",
-				slog.Any("error", err),
-				slog.String("date", dateFromStr),
-			)
+	dateFrom, err := request.ParseQueryToTime(c, "date_from", layoutDate)
+	if err != nil {
+		log.Error("failed to parse date_from to time.Time", slog.Any("error", err))
 
-			return resp.Respond(c, fiber.StatusBadRequest, resp.Error("invalid date_from"))
-		}
-		dateFrom = &v
+		return resp.Respond(c, fiber.StatusBadRequest, resp.Error("invalid date_from"))
 	}
 
-	var dateTo *time.Time
-	dateToStr := c.Query("date_to")
-	if dateToStr != "" {
-		v, err := time.Parse(layoutDate, dateToStr)
-		if err != nil {
-			log.Error("failed to parse date_to to time.Time", slog.Any("error", err), slog.String("date", dateToStr))
+	dateTo, err := request.ParseQueryToTime(c, "date_to", layoutDate)
+	if err != nil {
+		log.Error("failed to parse date_to to time.Time", slog.Any("error", err))
 
-			return resp.Respond(c, fiber.StatusBadRequest, resp.Error("invalid date_to"))
-		}
-		dateTo = &v
+		return resp.Respond(c, fiber.StatusBadRequest, resp.Error("invalid date_to"))
 	}
 
 	result, err := h.pricesS.GetPrices(ctx, typeID, dateFrom, dateTo)
