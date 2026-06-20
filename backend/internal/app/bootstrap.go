@@ -34,7 +34,7 @@ import (
 
 // New creates instant app.
 func New(ctx context.Context) (*App, error) {
-	//config
+	// config
 	if err := config.Init(); err != nil {
 		slog.Error("config init failed", slog.Any("error", err))
 
@@ -42,7 +42,7 @@ func New(ctx context.Context) (*App, error) {
 	}
 	slog.Info("configuration loaded", slog.String("file", viper.ConfigFileUsed()))
 
-	//logger
+	// logger
 	logLevel := viper.GetString(config.LogLevel)
 	l, err := logger.Init(logLevel)
 	if err != nil {
@@ -52,7 +52,7 @@ func New(ctx context.Context) (*App, error) {
 	}
 	l.Info("logger initialized", slog.String("logLevel", logLevel))
 
-	//storage
+	// storage
 	dsn := config.GetPostgresDSN()
 	db, err := postgres.New(ctx, l, dsn)
 	if err != nil {
@@ -62,7 +62,17 @@ func New(ctx context.Context) (*App, error) {
 	}
 	l.Info("db connected")
 
-	//repo
+	app := initApp(l, db)
+
+	return &App{
+		app: app,
+		l:   l,
+	}, nil
+}
+
+// initApp creates dependences, fiber app and setups router.
+func initApp(l *slog.Logger, db *postgres.Storage) *fiber.App {
+	// repositories
 	productTypeR := producttypeRepo.New(db.DB)
 	productR := productRepo.New(db.DB)
 	priceR := priceRepo.New(db.DB)
@@ -70,7 +80,7 @@ func New(ctx context.Context) (*App, error) {
 	stockR := stockRepo.New(db.DB)
 	productSupplyR := productSupplyRepo.New(db.DB)
 
-	//service
+	// services
 	productTypeS := producttypeService.New(l, productTypeR)
 	productS := productService.New(l, productR)
 	priceS := priceService.New(l, priceR)
@@ -81,7 +91,7 @@ func New(ctx context.Context) (*App, error) {
 	readTimeout := time.Second * time.Duration(viper.GetInt(config.ReadTimeout))
 	writeTimeout := time.Second * time.Duration(viper.GetInt(config.WriteTimeout))
 
-	//handler
+	// handlers
 	productTypeH := producttypeHandler.New(l, readTimeout, writeTimeout, productTypeS)
 	productH := productHandler.New(l, readTimeout, writeTimeout, productS)
 	priceH := priceHandler.New(l, readTimeout, writeTimeout, priceS)
@@ -89,7 +99,7 @@ func New(ctx context.Context) (*App, error) {
 	stockH := stockHandler.New(l, readTimeout, writeTimeout, stockS)
 	productSupplyH := productSupplyHandler.New(l, readTimeout, writeTimeout, productSupplyS)
 
-	//server
+	// app
 	app := fiber.New(fiber.Config{})
 	router.New(
 		app,
@@ -101,8 +111,5 @@ func New(ctx context.Context) (*App, error) {
 		productSupplyH,
 	).Setup()
 
-	return &App{
-		app: app,
-		l:   l,
-	}, nil
+	return app
 }
