@@ -5,13 +5,14 @@ import (
 
 	"github.com/google/uuid"
 
+	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
 )
 
 // Service provides business logic for suppliers.
 type Service interface {
 	// GetSuppliers returns slice suppliers by search param.
-	GetSuppliers(ctx context.Context, search string) ([]models.Supplier, error)
+	GetSuppliers(ctx context.Context, search string) ([]dto.SupplierDTO, error)
 	// CreateSupplier creates supplier in the db.
 	CreateSupplier(ctx context.Context, supplier *models.Supplier) error
 	// DeleteSupplier deletes supplier in the db by id.

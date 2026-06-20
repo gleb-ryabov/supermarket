@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
 	"supermarket/internal/repository/price"
 )
@@ -35,12 +36,12 @@ func (s *service) GetPrices(
 	typeID *uuid.UUID,
 	dateFrom *time.Time,
 	dateTo *time.Time,
-) ([]models.Price, error) {
+) ([]dto.PriceDTO, error) {
 	const op = "services.price.getPrices"
 
 	log := s.logger.With("op", op)
 
-	result, err := s.priceR.GetByParams(ctx, typeID, dateFrom, dateTo)
+	prices, err := s.priceR.GetByParams(ctx, typeID, dateFrom, dateTo)
 	if err != nil {
 		log.Error("failed to get products",
 			slog.Any("error", err),
@@ -50,6 +51,11 @@ func (s *service) GetPrices(
 		)
 
 		return nil, err
+	}
+
+	result := make([]dto.PriceDTO, 0, len(prices))
+	for _, v := range prices {
+		result = append(result, dto.ToPriceDTO(&v))
 	}
 
 	return result, nil

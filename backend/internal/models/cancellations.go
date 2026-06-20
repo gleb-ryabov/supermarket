@@ -13,6 +13,8 @@ type Cancellation struct {
 	DateTime  time.Time       `gorm:"column:datetime;type:timestamp;not null"`
 	ProductID uuid.UUID       `gorm:"column:product_id;type:uuid;not null"`
 	Quantity  decimal.Decimal `gorm:"column:quantity;type:decimal(12,3)"`
+
+	Product Product `gorm:"foreign_key:product_id;references:product_id"`
 }
 
 // TableName returns table name from db.

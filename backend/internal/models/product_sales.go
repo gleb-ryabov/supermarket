@@ -12,6 +12,9 @@ type ProductSale struct {
 	ProductID uuid.UUID       `gorm:"column:product_id;type:uuid;not null"`
 	SalePrice decimal.Decimal `gorm:"column:sale_price;type:decimal(10,2)"`
 	Quantity  decimal.Decimal `gorm:"column:quantity;type:decimal(12,3)"`
+
+	Product Product `gorm:"foreign_key:product_id;references:product_id"`
+	Sale    Sale    `gorm:"foreign_key:sale_id;references:sale_id"`
 }
 
 // TableName returns table name from db.

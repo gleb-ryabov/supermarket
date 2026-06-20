@@ -5,13 +5,14 @@ import (
 
 	"github.com/google/uuid"
 
+	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
 )
 
 // Service provides business logic for products.
 type Service interface {
 	// GetProducts returns slice products and error by params type name and type id.
-	GetProducts(ctx context.Context, name string, typeID *uuid.UUID) ([]models.Product, error)
+	GetProducts(ctx context.Context, name string, typeID *uuid.UUID) ([]dto.ProductDTO, error)
 	// CreateProduct creates product in the db.
 	CreateProduct(ctx context.Context, product *models.Product) error
 	// DeleteProduct deletes product in the db by id.

@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
 	"supermarket/internal/repository/product"
 )
@@ -29,12 +30,12 @@ func New(
 }
 
 // GetProducts returns slice products and error by params type name and type id.
-func (s *service) GetProducts(ctx context.Context, name string, typeID *uuid.UUID) ([]models.Product, error) {
+func (s *service) GetProducts(ctx context.Context, name string, typeID *uuid.UUID) ([]dto.ProductDTO, error) {
 	const op = "services.product.getProducts"
 
 	log := s.logger.With("op", op)
 
-	result, err := s.productR.GetByParams(ctx, name, typeID)
+	products, err := s.productR.GetByParams(ctx, name, typeID)
 	if err != nil {
 		log.Error("failed to get products",
 			slog.Any("error", err),
@@ -43,6 +44,11 @@ func (s *service) GetProducts(ctx context.Context, name string, typeID *uuid.UUI
 		)
 
 		return nil, err
+	}
+
+	result := make([]dto.ProductDTO, 0, len(products))
+	for _, v := range products {
+		result = append(result, dto.ToProductDTO(&v))
 	}
 
 	return result, nil

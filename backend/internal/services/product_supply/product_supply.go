@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
 	productsupply "supermarket/internal/repository/product_supply"
 	"supermarket/internal/services/stock"
@@ -43,7 +44,7 @@ func (s *service) GetProductSupplies(
 	supplierID *uuid.UUID,
 	dateFrom *time.Time,
 	dateTo *time.Time,
-) ([]models.ProductSupply, error) {
+) ([]dto.ProductSupplyDTO, error) {
 	const op = "services.product_supply.getProductSupplies"
 
 	log := s.logger.With("op", op)
@@ -61,7 +62,12 @@ func (s *service) GetProductSupplies(
 		return nil, err
 	}
 
-	return pt, err
+	result := make([]dto.ProductSupplyDTO, 0, len(pt))
+	for _, v := range pt {
+		result = append(result, dto.ToProductSupplyDTO(&v))
+	}
+
+	return result, err
 }
 
 // CreateProductSupply creates product supply in the db.
@@ -147,8 +153,7 @@ func (s *service) UpdateProductSupply(ctx context.Context, ps *models.ProductSup
 	}
 
 	shangedStock := ps.Quantity.Sub(psOld.Quantity)
-
-	if err = s.stockS.SetCountStock(ctx, ps.ProductID, shangedStock); err != nil {
+	if err = s.stockS.SetCountStock(ctx, psOld.ProductID, shangedStock); err != nil {
 		log.Error("failed to create product supply",
 			slog.Any("error", err),
 			slog.Any("productSupply", *ps),

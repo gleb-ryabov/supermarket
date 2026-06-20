@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
 	producttype "supermarket/internal/repository/product_type"
 )
@@ -29,7 +30,7 @@ func New(
 }
 
 // GetProductTypes returns slice product types and error by params product name and for adult.
-func (s *service) GetProductTypes(ctx context.Context, name string, forAdult *bool) ([]models.ProductType, error) {
+func (s *service) GetProductTypes(ctx context.Context, name string, forAdult *bool) ([]dto.ProductTypeDTO, error) {
 	const op = "services.product_types.getProductTypes"
 
 	log := s.logger.With("op", op)
@@ -45,7 +46,12 @@ func (s *service) GetProductTypes(ctx context.Context, name string, forAdult *bo
 		return nil, err
 	}
 
-	return pt, err
+	result := make([]dto.ProductTypeDTO, 0, len(pt))
+	for _, v := range pt {
+		result = append(result, dto.ToProductTypeDTO(&v))
+	}
+
+	return result, err
 }
 
 // CreateProductType creates product type in the db.

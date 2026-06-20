@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
 	"supermarket/internal/repository/supplier"
 )
@@ -29,12 +30,12 @@ func New(
 }
 
 // GetSuppliers returns slice suppliers by search param.
-func (s *service) GetSuppliers(ctx context.Context, search string) ([]models.Supplier, error) {
+func (s *service) GetSuppliers(ctx context.Context, search string) ([]dto.SupplierDTO, error) {
 	const op = "services.supplier.getSuppliers"
 
 	log := s.logger.With("op", op)
 
-	result, err := s.supplierR.GetByParams(ctx, search)
+	suppliers, err := s.supplierR.GetByParams(ctx, search)
 	if err != nil {
 		log.Error("failed to get suppliers",
 			slog.Any("error", err),
@@ -42,6 +43,11 @@ func (s *service) GetSuppliers(ctx context.Context, search string) ([]models.Sup
 		)
 
 		return nil, err
+	}
+
+	result := make([]dto.SupplierDTO, 0, len(suppliers))
+	for _, v := range suppliers {
+		result = append(result, dto.ToSupplierDTO(&v))
 	}
 
 	return result, nil

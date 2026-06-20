@@ -36,7 +36,7 @@ func (r *repository) GetByParams(
 ) ([]models.ProductSupply, error) {
 	var ps []models.ProductSupply
 
-	q := r.db.WithContext(ctx)
+	q := r.db.WithContext(ctx).Preload("Product").Preload("Supplier")
 
 	if productID != nil {
 		q = q.Where("product_id = ?", productID)

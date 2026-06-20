@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
 )
 
@@ -18,7 +19,7 @@ type Service interface {
 		supplierID *uuid.UUID,
 		dateFrom *time.Time,
 		dateTo *time.Time,
-	) ([]models.ProductSupply, error)
+	) ([]dto.ProductSupplyDTO, error)
 	// CreateProductSupply creates product supply in the db.
 	CreateProductSupply(ctx context.Context, ps *models.ProductSupply) error
 	// DeleteProductSupply deletes product supply in the db by id.

@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 
-	"supermarket/internal/models"
+	"supermarket/internal/http/dto"
 	"supermarket/internal/repository"
 	"supermarket/internal/repository/stock"
 	"supermarket/internal/services"
@@ -33,7 +33,7 @@ func New(
 }
 
 // GetStocks returns slice stocks and error by params product id and for adult.
-func (s *service) GetStocks(ctx context.Context, search string, productID *uuid.UUID) ([]models.Stock, error) {
+func (s *service) GetStocks(ctx context.Context, search string, productID *uuid.UUID) ([]dto.StockDTO, error) {
 	const op = "services.stocks.getStocks"
 
 	log := s.logger.With("op", op)
@@ -49,7 +49,12 @@ func (s *service) GetStocks(ctx context.Context, search string, productID *uuid.
 		return nil, err
 	}
 
-	return stocks, err
+	result := make([]dto.StockDTO, 0, len(stocks))
+	for _, v := range stocks {
+		result = append(result, dto.ToStockDTO(&v))
+	}
+
+	return result, err
 }
 
 // SetCountStock updates the quantity of a stock item by its product id. Sets += for count.
