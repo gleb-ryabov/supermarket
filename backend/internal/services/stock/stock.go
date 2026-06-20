@@ -107,7 +107,7 @@ func (s *service) DeleteStock(ctx context.Context, productID uuid.UUID) error {
 
 	stock := stocks[0]
 
-	if err := s.stocksR.Delete(ctx, stock.ID); err != nil {
+	if err = s.stocksR.Delete(ctx, stock.ID); err != nil {
 		log.Error("failed to delete stock",
 			slog.Any("error", err),
 			slog.Any("id", stock.ID),

@@ -9,6 +9,7 @@ import (
 
 	"supermarket/internal/http/handlers/price"
 	"supermarket/internal/http/handlers/product"
+	productsupply "supermarket/internal/http/handlers/product_supply"
 	producttype "supermarket/internal/http/handlers/product_type"
 	"supermarket/internal/http/handlers/stock"
 	"supermarket/internal/http/handlers/supplier"
@@ -18,11 +19,12 @@ import (
 type Router struct {
 	app *fiber.App
 
-	productType *producttype.Handler
-	product     *product.Handler
-	price       *price.Handler
-	supplier    *supplier.Handler
-	stock       *stock.Handler
+	productType   *producttype.Handler
+	product       *product.Handler
+	price         *price.Handler
+	supplier      *supplier.Handler
+	stock         *stock.Handler
+	productSupply *productsupply.Handler
 }
 
 // New creates http router.
@@ -33,14 +35,16 @@ func New(
 	price *price.Handler,
 	supplier *supplier.Handler,
 	stock *stock.Handler,
+	productSupply *productsupply.Handler,
 ) *Router {
 	return &Router{
-		app:         app,
-		productType: productType,
-		product:     product,
-		price:       price,
-		supplier:    supplier,
-		stock:       stock,
+		app:           app,
+		productType:   productType,
+		product:       product,
+		price:         price,
+		supplier:      supplier,
+		stock:         stock,
+		productSupply: productSupply,
 	}
 }
 
@@ -80,8 +84,11 @@ func (r *Router) Setup() {
 	stock := api.Group("/stock")
 	stock.Get("/", r.stock.GetStocks)
 
-	productSupplies := r.app.Group("/product-supplies")
-	_ = productSupplies
+	productSupplies := api.Group("/product-supplies")
+	productSupplies.Get("/", r.productSupply.GetProductSupplies)
+	productSupplies.Post("/", r.productSupply.CreateProductSupply)
+	productSupplies.Delete("/:id", r.productSupply.DeleteProductSupply)
+	productSupplies.Put("/:id", r.productSupply.UpdateProductSupply)
 
 	sales := r.app.Group("/sales")
 	_ = sales

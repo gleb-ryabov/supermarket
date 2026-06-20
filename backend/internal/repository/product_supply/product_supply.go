@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
+
 	"supermarket/internal/models"
 	"supermarket/internal/repository"
-
-	"github.com/google/uuid"
 )
 
 // Repository is the interface for product supplies.
@@ -17,7 +17,7 @@ type Repository interface {
 	GetByParams(
 		ctx context.Context,
 		productID *uuid.UUID,
-		supplierId *uuid.UUID,
+		supplierID *uuid.UUID,
 		dateFrom *time.Time,
 		dateTo *time.Time,
 	) ([]models.ProductSupply, error)

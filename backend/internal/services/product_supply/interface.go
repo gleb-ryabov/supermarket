@@ -12,10 +12,10 @@ import (
 // Service provides business logic for product supplies.
 type Service interface {
 	// GetProductSupplies returns slice product supplies and error by params product id, supplie id and period delivery.
-	GetByParams(
+	GetProductSupplies(
 		ctx context.Context,
 		productID *uuid.UUID,
-		supplierId *uuid.UUID,
+		supplierID *uuid.UUID,
 		dateFrom *time.Time,
 		dateTo *time.Time,
 	) ([]models.ProductSupply, error)

@@ -52,11 +52,15 @@ func (r *repository) GetByParams(ctx context.Context, search string, productID *
 
 // SetCountByProductID updates the quantity of a stock item by its ID.
 func (r *repository) SetCountByProductID(ctx context.Context, productID uuid.UUID, count decimal.Decimal) error {
-	result := r.db.WithContext(ctx).
+	q := r.db.WithContext(ctx).
 		Model(&models.Stock{}).
-		Where("product_id = ?", productID).
-		Where("quantity >= ?", count).
-		Update("quantity", gorm.Expr("quantity + ?", count))
+		Where("product_id = ?", productID)
+
+	if count.IsNegative() {
+		q = q.Where("quantity >= ?", count.Abs())
+	}
+
+	result := q.Update("quantity", gorm.Expr("quantity + ?", count))
 
 	if result.Error != nil {
 		return result.Error
@@ -72,7 +76,6 @@ func (r *repository) SetCountByProductID(ctx context.Context, productID uuid.UUI
 // FirstOrCreateByProductID finds the stock by product ID, otherwise if not found creates a new stock.
 func (r *repository) FirstOrCreateByProductID(ctx context.Context, productID uuid.UUID) (*models.Stock, error) {
 	s := models.Stock{
-		ID:        uuid.New(),
 		ProductID: &productID,
 		Quantity:  decimal.NewFromInt(0),
 	}
@@ -80,9 +83,10 @@ func (r *repository) FirstOrCreateByProductID(ctx context.Context, productID uui
 	err := r.db.WithContext(ctx).
 		Where("product_id = ?", productID).
 		FirstOrCreate(&s).Error
+
 	if err != nil {
 		return nil, err
 	}
 
-	return &s, err
+	return &s, nil
 }

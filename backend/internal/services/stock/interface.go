@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 
 	"supermarket/internal/models"
 )
@@ -13,5 +14,5 @@ type Service interface {
 	// GetStocks returns slice stocks and error by params product id and for adult.
 	GetStocks(ctx context.Context, search string, productID *uuid.UUID) ([]models.Stock, error)
 	// SetCountStock updates the quantity of a stock item by its product ID. Sets += for count.
-	SetCountStock(ctx context.Context, productID uuid.UUID, count int) error
+	SetCountStock(ctx context.Context, productID uuid.UUID, count decimal.Decimal) error
 }

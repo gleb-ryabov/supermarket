@@ -37,10 +37,10 @@ func New(
 }
 
 // GetProductSupplies returns slice product supplies and error by params product id, supplie id and period delivery.
-func (s *service) GetByParams(
+func (s *service) GetProductSupplies(
 	ctx context.Context,
 	productID *uuid.UUID,
-	supplierId *uuid.UUID,
+	supplierID *uuid.UUID,
 	dateFrom *time.Time,
 	dateTo *time.Time,
 ) ([]models.ProductSupply, error) {
@@ -48,12 +48,12 @@ func (s *service) GetByParams(
 
 	log := s.logger.With("op", op)
 
-	pt, err := s.productSupplyR.GetByParams(ctx, productID, supplierId, dateFrom, dateTo)
+	pt, err := s.productSupplyR.GetByParams(ctx, productID, supplierID, dateFrom, dateTo)
 	if err != nil {
 		log.Error("failed to get product supplies",
 			slog.Any("error", err),
 			slog.Any("productId", productID),
-			slog.Any("supplieId", supplierId),
+			slog.Any("supplieId", supplierID),
 			slog.Any("dateFrom", dateFrom),
 			slog.Any("dateTo", dateTo),
 		)
@@ -109,7 +109,7 @@ func (s *service) DeleteProductSupply(ctx context.Context, id uuid.UUID) error {
 		return err
 	}
 
-	if err := s.stockS.SetCountStock(ctx, ps.ProductID, ps.Quantity.Neg()); err != nil {
+	if err = s.stockS.SetCountStock(ctx, ps.ProductID, ps.Quantity.Neg()); err != nil {
 		log.Error("failed to set count stock",
 			slog.Any("error", err),
 			slog.Any("productSupply", *ps),
@@ -118,7 +118,7 @@ func (s *service) DeleteProductSupply(ctx context.Context, id uuid.UUID) error {
 		return err
 	}
 
-	if err := s.productSupplyR.Delete(ctx, id); err != nil {
+	if err = s.productSupplyR.Delete(ctx, id); err != nil {
 		log.Error("failed to delete product supplies",
 			slog.Any("error", err),
 			slog.Any("id", id),
@@ -148,7 +148,7 @@ func (s *service) UpdateProductSupply(ctx context.Context, ps *models.ProductSup
 
 	shangedStock := ps.Quantity.Sub(psOld.Quantity)
 
-	if err := s.stockS.SetCountStock(ctx, ps.ProductID, shangedStock); err != nil {
+	if err = s.stockS.SetCountStock(ctx, ps.ProductID, shangedStock); err != nil {
 		log.Error("failed to create product supply",
 			slog.Any("error", err),
 			slog.Any("productSupply", *ps),
@@ -157,7 +157,7 @@ func (s *service) UpdateProductSupply(ctx context.Context, ps *models.ProductSup
 		return err
 	}
 
-	if err := s.productSupplyR.Update(ctx, ps); err != nil {
+	if err = s.productSupplyR.Update(ctx, ps); err != nil {
 		log.Error("failed to update product supply",
 			slog.Any("error", err),
 			slog.Any("productSupply", *ps),

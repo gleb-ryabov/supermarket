@@ -30,7 +30,7 @@ func New(db *gorm.DB) productsupply.Repository {
 func (r *repository) GetByParams(
 	ctx context.Context,
 	productID *uuid.UUID,
-	supplierId *uuid.UUID,
+	supplierID *uuid.UUID,
 	dateFrom *time.Time,
 	dateTo *time.Time,
 ) ([]models.ProductSupply, error) {
@@ -42,8 +42,8 @@ func (r *repository) GetByParams(
 		q = q.Where("product_id = ?", productID)
 	}
 
-	if supplierId != nil {
-		q = q.Where("supplier_id = ?", supplierId)
+	if supplierID != nil {
+		q = q.Where("supplier_id = ?", supplierID)
 	}
 
 	if dateFrom != nil {
