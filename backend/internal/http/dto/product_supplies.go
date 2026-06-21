@@ -24,12 +24,17 @@ func ToProductSupplyDTO(m *models.ProductSupply) ProductSupplyDTO {
 		return ProductSupplyDTO{}
 	}
 
+	var deliveryDate string
+	if m.DeliveryDate != nil {
+		deliveryDate = m.DeliveryDate.Format("02.01.2006")
+	}
+
 	return ProductSupplyDTO{
 		ID:           m.ID,
 		ProductID:    m.ProductID,
 		Price:        m.Price,
 		Quantity:     m.Quantity,
-		DeliveryDate: m.DeliveryDate.Format("02.01.2006"),
+		DeliveryDate: deliveryDate,
 		ProductName:  m.Product.Name,
 		SupplierName: m.Supplier.Name,
 	}

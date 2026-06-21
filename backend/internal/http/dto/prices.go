@@ -24,10 +24,15 @@ func ToPriceDTO(m *models.Price) PriceDTO {
 		return PriceDTO{}
 	}
 
+	var dateEnd string
+	if m.DateEnd != nil {
+		dateEnd = m.DateEnd.Format("02.01.2006")
+	}
+
 	return PriceDTO{
 		ID:          m.ID,
 		DateStart:   m.DateStart.Format("02.01.2006"),
-		DateEnd:     m.DateEnd.Format("02.01.2006"),
+		DateEnd:     dateEnd,
 		Discount:    m.Discount,
 		FullPrice:   m.FullPrice,
 		TotalPrice:  m.TotalPrice,
