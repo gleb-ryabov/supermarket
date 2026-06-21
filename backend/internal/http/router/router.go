@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 
+	"supermarket/internal/http/handlers/cancellation"
 	"supermarket/internal/http/handlers/price"
 	"supermarket/internal/http/handlers/product"
 	productsupply "supermarket/internal/http/handlers/product_supply"
@@ -25,6 +26,7 @@ type Router struct {
 	supplier      *supplier.Handler
 	stock         *stock.Handler
 	productSupply *productsupply.Handler
+	cancellation  *cancellation.Handler
 }
 
 // New creates http router.
@@ -36,6 +38,7 @@ func New(
 	supplier *supplier.Handler,
 	stock *stock.Handler,
 	productSupply *productsupply.Handler,
+	cancellation *cancellation.Handler,
 ) *Router {
 	return &Router{
 		app:           app,
@@ -45,6 +48,7 @@ func New(
 		supplier:      supplier,
 		stock:         stock,
 		productSupply: productSupply,
+		cancellation:  cancellation,
 	}
 }
 
@@ -96,8 +100,11 @@ func (r *Router) Setup() {
 	productSales := r.app.Group("/product-sales")
 	_ = productSales
 
-	cancellations := r.app.Group("/cancellations")
-	_ = cancellations
+	cancellations := api.Group("/cancellations")
+	cancellations.Get("/", r.cancellation.GetCancellations)
+	cancellations.Post("/", r.cancellation.CreateCancellation)
+	cancellations.Delete("/:id", r.cancellation.DeleteCancellation)
+	cancellations.Put("/:id", r.cancellation.UpdateCancellation)
 
 	reports := r.app.Group("/reports")
 	_ = reports

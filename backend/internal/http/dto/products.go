@@ -1,13 +1,13 @@
 package dto
 
 import (
-	"supermarket/internal/models"
-
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
+
+	"supermarket/internal/models"
 )
 
-// Product represents DTO for a concrete item in the catalog that can be sold or supplied.
+// ProductDTO represents DTO for a concrete item in the catalog that can be sold or supplied.
 type ProductDTO struct {
 	ID           uuid.UUID       `json:"product_id"`
 	Name         string          `json:"name"`

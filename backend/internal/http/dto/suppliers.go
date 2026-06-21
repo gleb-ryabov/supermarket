@@ -1,9 +1,9 @@
 package dto
 
 import (
-	"supermarket/internal/models"
-
 	"github.com/google/uuid"
+
+	"supermarket/internal/models"
 )
 
 // SupplierDTO represents supplier for API.

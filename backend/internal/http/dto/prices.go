@@ -1,10 +1,10 @@
 package dto
 
 import (
-	"supermarket/internal/models"
-
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
+
+	"supermarket/internal/models"
 )
 
 // PriceDTO represents DTO for product pricing for a specific time period.

@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 
 	"supermarket/internal/config"
+	cancellationHandler "supermarket/internal/http/handlers/cancellation"
 	priceHandler "supermarket/internal/http/handlers/price"
 	productHandler "supermarket/internal/http/handlers/product"
 	productSupplyHandler "supermarket/internal/http/handlers/product_supply"
@@ -17,12 +18,14 @@ import (
 	supplierHandler "supermarket/internal/http/handlers/supplier"
 	"supermarket/internal/http/router"
 	"supermarket/internal/logger"
+	cancellationRepo "supermarket/internal/repository/cancellation/gorm"
 	priceRepo "supermarket/internal/repository/price/gorm"
 	productRepo "supermarket/internal/repository/product/gorm"
 	productSupplyRepo "supermarket/internal/repository/product_supply/gorm"
 	producttypeRepo "supermarket/internal/repository/product_type/gorm"
 	stockRepo "supermarket/internal/repository/stock/gorm"
 	supplierRepo "supermarket/internal/repository/supplier/gorm"
+	cancellationService "supermarket/internal/services/cancellation"
 	priceService "supermarket/internal/services/price"
 	productService "supermarket/internal/services/product"
 	productSupplyService "supermarket/internal/services/product_supply"
@@ -79,6 +82,7 @@ func initApp(l *slog.Logger, db *postgres.Storage) *fiber.App {
 	supplierR := supplierRepo.New(db.DB)
 	stockR := stockRepo.New(db.DB)
 	productSupplyR := productSupplyRepo.New(db.DB)
+	cancellationR := cancellationRepo.New(db.DB)
 
 	// services
 	productTypeS := producttypeService.New(l, productTypeR)
@@ -87,6 +91,7 @@ func initApp(l *slog.Logger, db *postgres.Storage) *fiber.App {
 	supplierS := supplierService.New(l, supplierR)
 	stockS := stockService.New(l, stockR)
 	productSupplyS := productSupplyService.New(l, productSupplyR, stockS)
+	cancellationS := cancellationService.New(l, cancellationR, stockS)
 
 	readTimeout := time.Second * time.Duration(viper.GetInt(config.ReadTimeout))
 	writeTimeout := time.Second * time.Duration(viper.GetInt(config.WriteTimeout))
@@ -98,6 +103,7 @@ func initApp(l *slog.Logger, db *postgres.Storage) *fiber.App {
 	supplierH := supplierHandler.New(l, readTimeout, writeTimeout, supplierS)
 	stockH := stockHandler.New(l, readTimeout, writeTimeout, stockS)
 	productSupplyH := productSupplyHandler.New(l, readTimeout, writeTimeout, productSupplyS)
+	cancellationH := cancellationHandler.New(l, readTimeout, writeTimeout, cancellationS)
 
 	// app
 	app := fiber.New(fiber.Config{})
@@ -109,6 +115,7 @@ func initApp(l *slog.Logger, db *postgres.Storage) *fiber.App {
 		supplierH,
 		stockH,
 		productSupplyH,
+		cancellationH,
 	).Setup()
 
 	return app

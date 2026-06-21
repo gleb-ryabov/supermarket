@@ -19,9 +19,9 @@ import (
 type service struct {
 	logger *slog.Logger
 
-	stockS stock.Service
-
 	productSupplyR productsupply.Repository
+
+	stockS stock.Service
 }
 
 // New creates service for product supplies.
@@ -32,8 +32,8 @@ func New(
 ) Service {
 	return &service{
 		logger:         logger,
-		stockS:         stockS,
 		productSupplyR: productSupplyR,
+		stockS:         stockS,
 	}
 }
 
@@ -154,7 +154,7 @@ func (s *service) UpdateProductSupply(ctx context.Context, ps *models.ProductSup
 
 	shangedStock := ps.Quantity.Sub(psOld.Quantity)
 	if err = s.stockS.SetCountStock(ctx, psOld.ProductID, shangedStock); err != nil {
-		log.Error("failed to create product supply",
+		log.Error("failed to set count stock",
 			slog.Any("error", err),
 			slog.Any("productSupply", *ps),
 		)

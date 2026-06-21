@@ -1,9 +1,9 @@
 package dto
 
 import (
-	"supermarket/internal/models"
-
 	"github.com/google/uuid"
+
+	"supermarket/internal/models"
 )
 
 // ProductTypeDTO represents a DTO product category/type used for grouping products.
