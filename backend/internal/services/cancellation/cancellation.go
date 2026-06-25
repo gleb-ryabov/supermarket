@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 
 	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
@@ -85,7 +86,7 @@ func (s *service) CreateCancellation(ctx context.Context, cancellation *models.C
 		return err
 	}
 
-	if err := s.stockS.SetCountStock(ctx, cancellation.ProductID, cancellation.Quantity.Neg()); err != nil {
+	if err := s.stockS.IncreaseStock(ctx, cancellation.ProductID, cancellation.Quantity.Neg()); err != nil {
 		log.Error("failed to set count stock",
 			slog.Any("error", err),
 			slog.Any("cancellation", *cancellation),
@@ -101,32 +102,17 @@ func (s *service) CreateCancellation(ctx context.Context, cancellation *models.C
 func (s *service) DeleteCancellation(ctx context.Context, id uuid.UUID) error {
 	const op = "services.cancellation.deleteCancellation"
 
-	log := s.logger.With("op", op)
+	log := s.logger.With("op", op).
+		With("id", id)
 
-	cancellation, err := s.cancellationR.GetByID(ctx, id)
-	if err != nil {
-		log.Error("failed to get cancellation",
-			slog.Any("error", err),
-			slog.Any("id", id),
-		)
+	if err := s.stockS.UpdateStockByCancellation(ctx, id, decimal.Zero); err != nil {
+		log.Error("failed to set count stock", slog.Any("error", err))
 
 		return err
 	}
 
-	if err = s.stockS.SetCountStock(ctx, cancellation.ProductID, cancellation.Quantity); err != nil {
-		log.Error("failed to set count stock",
-			slog.Any("error", err),
-			slog.Any("cancellation", *cancellation),
-		)
-
-		return err
-	}
-
-	if err = s.cancellationR.Delete(ctx, id); err != nil {
-		log.Error("failed to delete cancellation",
-			slog.Any("error", err),
-			slog.Any("id", id),
-		)
+	if err := s.cancellationR.Delete(ctx, id); err != nil {
+		log.Error("failed to delete cancellation", slog.Any("error", err))
 
 		return err
 	}
@@ -140,19 +126,7 @@ func (s *service) UpdateCancellation(ctx context.Context, cancellation *models.C
 
 	log := s.logger.With("op", op)
 
-	cancellationOld, err := s.cancellationR.GetByID(ctx, cancellation.ID)
-	if err != nil {
-		log.Error("failed to get old instance cancellation",
-			slog.Any("error", err),
-			slog.Any("id", cancellation.ID),
-		)
-
-		return err
-	}
-	log.Debug("get id")
-
-	shangedStock := cancellation.Quantity.Sub(cancellationOld.Quantity)
-	if err = s.stockS.SetCountStock(ctx, cancellationOld.ProductID, shangedStock.Neg()); err != nil {
+	if err := s.stockS.UpdateStockByCancellation(ctx, cancellation.ID, cancellation.Quantity); err != nil {
 		log.Error("failed to set count stock",
 			slog.Any("error", err),
 			slog.Any("cancellation", *cancellation),
@@ -161,7 +135,7 @@ func (s *service) UpdateCancellation(ctx context.Context, cancellation *models.C
 		return err
 	}
 
-	if err = s.cancellationR.Update(ctx, cancellation); err != nil {
+	if err := s.cancellationR.Update(ctx, cancellation); err != nil {
 		log.Error("failed to update cancellation",
 			slog.Any("error", err),
 			slog.Any("cancellation", *cancellation),

@@ -90,3 +90,83 @@ func (r *repository) FirstOrCreateByProductID(ctx context.Context, productID uui
 
 	return &s, nil
 }
+
+// UpdateStockByProductSale changes the quantity of a stock item by update product sale.
+func (r *repository) UpdateStockByProductSale(
+	ctx context.Context,
+	productSaleID uuid.UUID,
+	newQuantity decimal.Decimal,
+) error {
+	err := r.db.WithContext(ctx).Exec(`
+			UPDATE stock s 
+			SET quantity = s.quantity + (ps.quantity - ?)
+			FROM product_sales ps
+			WHERE ps.product_sales_id = ?
+				AND ps.product_id = s.product_id 
+		`, newQuantity, productSaleID,
+	).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateStockOnDeleteSale changes the quantity of a stock item on drop sale.
+func (r *repository) UpdateStockOnDeleteSale(ctx context.Context, saleID uuid.UUID) error {
+	err := r.db.WithContext(ctx).Exec(`
+			UPDATE stock s 
+			SET quantity = s.quantity + ps.quantity
+			FROM product_sales ps
+			WHERE ps.sale_id = ?
+				AND ps.product_id = s.product_id 
+		`, saleID,
+	).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateStockByProductSupply changes the quantity of a stock item by update product supply.
+func (r *repository) UpdateStockByProductSupply(
+	ctx context.Context,
+	productSupplyID uuid.UUID,
+	newQuantity decimal.Decimal,
+) error {
+	err := r.db.WithContext(ctx).Exec(`
+			UPDATE stock s 
+			SET quantity = s.quantity - (ps.quantity - ?)
+			FROM product_supplies ps
+			WHERE ps.supply_id = ?
+				AND ps.product_id = s.product_id 
+		`, newQuantity, productSupplyID,
+	).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateStockByCancellation changes the quantity of a stock item by update cancellation.
+func (r *repository) UpdateStockByCancellation(
+	ctx context.Context,
+	cancellationID uuid.UUID,
+	newQuantity decimal.Decimal,
+) error {
+	err := r.db.WithContext(ctx).Exec(`
+			UPDATE stock s 
+			SET quantity = s.quantity + (c.quantity - ?)
+			FROM cancellation c
+			WHERE c.cancellation_id = ?
+				AND c.product_id = s.product_id 
+		`, newQuantity, cancellationID,
+	).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 
 	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
@@ -87,7 +88,7 @@ func (s *service) CreateProductSupply(ctx context.Context, ps *models.ProductSup
 		return err
 	}
 
-	if err := s.stockS.SetCountStock(ctx, ps.ProductID, ps.Quantity); err != nil {
+	if err := s.stockS.IncreaseStock(ctx, ps.ProductID, ps.Quantity); err != nil {
 		log.Error("failed to set count stock",
 			slog.Any("error", err),
 			slog.Any("productSupply", *ps),
@@ -103,32 +104,17 @@ func (s *service) CreateProductSupply(ctx context.Context, ps *models.ProductSup
 func (s *service) DeleteProductSupply(ctx context.Context, id uuid.UUID) error {
 	const op = "services.product_supply.deleteProductSupply"
 
-	log := s.logger.With("op", op)
+	log := s.logger.With("op", op).
+		With("productSupplyID", id)
 
-	ps, err := s.productSupplyR.GetByID(ctx, id)
-	if err != nil {
-		log.Error("failed to get supply",
-			slog.Any("error", err),
-			slog.Any("id", id),
-		)
+	if err := s.stockS.UpdateStockByProductSupply(ctx, id, decimal.Zero); err != nil {
+		log.Error("failed to set count stock", slog.Any("error", err))
 
 		return err
 	}
 
-	if err = s.stockS.SetCountStock(ctx, ps.ProductID, ps.Quantity.Neg()); err != nil {
-		log.Error("failed to set count stock",
-			slog.Any("error", err),
-			slog.Any("productSupply", *ps),
-		)
-
-		return err
-	}
-
-	if err = s.productSupplyR.Delete(ctx, id); err != nil {
-		log.Error("failed to delete product supplies",
-			slog.Any("error", err),
-			slog.Any("id", id),
-		)
+	if err := s.productSupplyR.Delete(ctx, id); err != nil {
+		log.Error("failed to delete product supplies", slog.Any("error", err))
 
 		return err
 	}
@@ -142,18 +128,7 @@ func (s *service) UpdateProductSupply(ctx context.Context, ps *models.ProductSup
 
 	log := s.logger.With("op", op)
 
-	psOld, err := s.productSupplyR.GetByID(ctx, ps.ID)
-	if err != nil {
-		log.Error("failed to get old instance supply",
-			slog.Any("error", err),
-			slog.Any("id", ps.ID),
-		)
-
-		return err
-	}
-
-	shangedStock := ps.Quantity.Sub(psOld.Quantity)
-	if err = s.stockS.SetCountStock(ctx, psOld.ProductID, shangedStock); err != nil {
+	if err := s.stockS.UpdateStockByProductSupply(ctx, ps.ID, ps.Quantity); err != nil {
 		log.Error("failed to set count stock",
 			slog.Any("error", err),
 			slog.Any("productSupply", *ps),
@@ -162,7 +137,7 @@ func (s *service) UpdateProductSupply(ctx context.Context, ps *models.ProductSup
 		return err
 	}
 
-	if err = s.productSupplyR.Update(ctx, ps); err != nil {
+	if err := s.productSupplyR.Update(ctx, ps); err != nil {
 		log.Error("failed to update product supply",
 			slog.Any("error", err),
 			slog.Any("productSupply", *ps),

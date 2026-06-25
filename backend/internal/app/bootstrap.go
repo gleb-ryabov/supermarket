@@ -12,8 +12,10 @@ import (
 	cancellationHandler "supermarket/internal/http/handlers/cancellation"
 	priceHandler "supermarket/internal/http/handlers/price"
 	productHandler "supermarket/internal/http/handlers/product"
+	productSaleHandler "supermarket/internal/http/handlers/product_sale"
 	productSupplyHandler "supermarket/internal/http/handlers/product_supply"
 	producttypeHandler "supermarket/internal/http/handlers/product_type"
+	saleHandler "supermarket/internal/http/handlers/sale"
 	stockHandler "supermarket/internal/http/handlers/stock"
 	supplierHandler "supermarket/internal/http/handlers/supplier"
 	"supermarket/internal/http/router"
@@ -21,15 +23,19 @@ import (
 	cancellationRepo "supermarket/internal/repository/cancellation/gorm"
 	priceRepo "supermarket/internal/repository/price/gorm"
 	productRepo "supermarket/internal/repository/product/gorm"
+	productSaleRepo "supermarket/internal/repository/product_sale/gorm"
 	productSupplyRepo "supermarket/internal/repository/product_supply/gorm"
 	producttypeRepo "supermarket/internal/repository/product_type/gorm"
+	saleRepo "supermarket/internal/repository/sale/gorm"
 	stockRepo "supermarket/internal/repository/stock/gorm"
 	supplierRepo "supermarket/internal/repository/supplier/gorm"
 	cancellationService "supermarket/internal/services/cancellation"
 	priceService "supermarket/internal/services/price"
 	productService "supermarket/internal/services/product"
+	productSaleService "supermarket/internal/services/product_sale"
 	productSupplyService "supermarket/internal/services/product_supply"
 	producttypeService "supermarket/internal/services/product_type"
+	saleService "supermarket/internal/services/sale"
 	stockService "supermarket/internal/services/stock"
 	supplierService "supermarket/internal/services/supplier"
 	"supermarket/internal/storage/postgres"
@@ -83,6 +89,8 @@ func initApp(l *slog.Logger, db *postgres.Storage) *fiber.App {
 	stockR := stockRepo.New(db.DB)
 	productSupplyR := productSupplyRepo.New(db.DB)
 	cancellationR := cancellationRepo.New(db.DB)
+	productSaleR := productSaleRepo.New(db.DB)
+	saleR := saleRepo.New(db.DB)
 
 	// services
 	productTypeS := producttypeService.New(l, productTypeR)
@@ -92,6 +100,8 @@ func initApp(l *slog.Logger, db *postgres.Storage) *fiber.App {
 	stockS := stockService.New(l, stockR)
 	productSupplyS := productSupplyService.New(l, productSupplyR, stockS)
 	cancellationS := cancellationService.New(l, cancellationR, stockS)
+	productSaleS := productSaleService.New(l, productSaleR, stockS)
+	saleS := saleService.New(l, saleR, productSaleS)
 
 	readTimeout := time.Second * time.Duration(viper.GetInt(config.ReadTimeout))
 	writeTimeout := time.Second * time.Duration(viper.GetInt(config.WriteTimeout))
@@ -104,6 +114,8 @@ func initApp(l *slog.Logger, db *postgres.Storage) *fiber.App {
 	stockH := stockHandler.New(l, readTimeout, writeTimeout, stockS)
 	productSupplyH := productSupplyHandler.New(l, readTimeout, writeTimeout, productSupplyS)
 	cancellationH := cancellationHandler.New(l, readTimeout, writeTimeout, cancellationS)
+	productSaleH := productSaleHandler.New(l, readTimeout, writeTimeout, productSaleS)
+	saleH := saleHandler.New(l, readTimeout, writeTimeout, saleS)
 
 	// app
 	app := fiber.New(fiber.Config{})
@@ -116,6 +128,8 @@ func initApp(l *slog.Logger, db *postgres.Storage) *fiber.App {
 		stockH,
 		productSupplyH,
 		cancellationH,
+		productSaleH,
+		saleH,
 	).Setup()
 
 	return app

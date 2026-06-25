@@ -57,9 +57,9 @@ func (s *service) GetStocks(ctx context.Context, search string, productID *uuid.
 	return result, err
 }
 
-// SetCountStock updates the quantity of a stock item by its product id. Sets += for count.
+// IncreaseStock updates the quantity of a stock item by its product id. Sets += for count.
 // If not found creates a new item.
-func (s *service) SetCountStock(ctx context.Context, productID uuid.UUID, count decimal.Decimal) error {
+func (s *service) IncreaseStock(ctx context.Context, productID uuid.UUID, count decimal.Decimal) error {
 	const op = "services.stocks.setCountStock"
 
 	log := s.logger.
@@ -117,6 +117,85 @@ func (s *service) DeleteStock(ctx context.Context, productID uuid.UUID) error {
 			slog.Any("error", err),
 			slog.Any("id", stock.ID),
 		)
+
+		return err
+	}
+
+	return nil
+}
+
+// UpdateStockByProductSale changes the quantity of a stock item by update product sale.
+func (s *service) UpdateStockByProductSale(
+	ctx context.Context,
+	productSaleID uuid.UUID,
+	newQuantity decimal.Decimal,
+) error {
+	const op = "services.stocks.updateStockByProductSale"
+
+	log := s.logger.With("op", op).
+		With("productSaleID", productSaleID).
+		With("newQuantity", newQuantity)
+
+	if err := s.stocksR.UpdateStockByProductSale(ctx, productSaleID, newQuantity); err != nil {
+		log.Error("failed to update stock", slog.Any("error", err))
+
+		return err
+	}
+
+	return nil
+}
+
+// UpdateStockOnDeleteSale changes the quantity of a stock item on drop sale.
+func (s *service) UpdateStockOnDeleteSale(ctx context.Context, saleID uuid.UUID) error {
+	const op = "services.stocks.updateStockByProductSale"
+
+	log := s.logger.With("op", op).
+		With("saleID", saleID)
+
+	if err := s.stocksR.UpdateStockOnDeleteSale(ctx, saleID); err != nil {
+		log.Error("failed to update stock", slog.Any("error", err))
+
+		return err
+	}
+
+	return nil
+}
+
+// UpdateStockByProductSupply changes the quantity of a stock item by update product supply.
+func (s *service) UpdateStockByProductSupply(
+	ctx context.Context,
+	productSupplyID uuid.UUID,
+	newQuantity decimal.Decimal,
+) error {
+	const op = "services.stocks.updateStockByProductSupply"
+
+	log := s.logger.With("op", op).
+		With("productSupplyID", productSupplyID).
+		With("newQuantity", newQuantity)
+
+	if err := s.stocksR.UpdateStockByProductSupply(ctx, productSupplyID, newQuantity); err != nil {
+		log.Error("failed to update stock", slog.Any("error", err))
+
+		return err
+	}
+
+	return nil
+}
+
+// UpdateStockByCancellation changes the quantity of a stock item by update cancellation.
+func (s *service) UpdateStockByCancellation(
+	ctx context.Context,
+	cancellationID uuid.UUID,
+	newQuantity decimal.Decimal,
+) error {
+	const op = "services.stocks.updateStockByCancellation"
+
+	log := s.logger.With("op", op).
+		With("cancellationID", cancellationID).
+		With("newQuantity", newQuantity)
+
+	if err := s.stocksR.UpdateStockByCancellation(ctx, cancellationID, newQuantity); err != nil {
+		log.Error("failed to update stock", slog.Any("error", err))
 
 		return err
 	}

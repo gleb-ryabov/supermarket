@@ -10,8 +10,10 @@ import (
 	"supermarket/internal/http/handlers/cancellation"
 	"supermarket/internal/http/handlers/price"
 	"supermarket/internal/http/handlers/product"
+	productsale "supermarket/internal/http/handlers/product_sale"
 	productsupply "supermarket/internal/http/handlers/product_supply"
 	producttype "supermarket/internal/http/handlers/product_type"
+	"supermarket/internal/http/handlers/sale"
 	"supermarket/internal/http/handlers/stock"
 	"supermarket/internal/http/handlers/supplier"
 )
@@ -27,6 +29,8 @@ type Router struct {
 	stock         *stock.Handler
 	productSupply *productsupply.Handler
 	cancellation  *cancellation.Handler
+	productSale   *productsale.Handler
+	sale          *sale.Handler
 }
 
 // New creates http router.
@@ -39,6 +43,8 @@ func New(
 	stock *stock.Handler,
 	productSupply *productsupply.Handler,
 	cancellation *cancellation.Handler,
+	productSale *productsale.Handler,
+	sale *sale.Handler,
 ) *Router {
 	return &Router{
 		app:           app,
@@ -49,6 +55,8 @@ func New(
 		stock:         stock,
 		productSupply: productSupply,
 		cancellation:  cancellation,
+		productSale:   productSale,
+		sale:          sale,
 	}
 }
 
@@ -94,11 +102,17 @@ func (r *Router) Setup() {
 	productSupplies.Delete("/:id", r.productSupply.DeleteProductSupply)
 	productSupplies.Put("/:id", r.productSupply.UpdateProductSupply)
 
-	sales := r.app.Group("/sales")
-	_ = sales
+	productSales := api.Group("/product-sales")
+	productSales.Get("/", r.productSale.GetProductsInSale)
+	productSales.Post("/", r.productSale.CreateProductInSale)
+	productSales.Delete("/:id", r.productSale.DeleteProductInSale)
+	productSales.Put("/:id", r.productSale.UpdateProductInSale)
 
-	productSales := r.app.Group("/product-sales")
-	_ = productSales
+	sales := api.Group("/sales")
+	sales.Get("/", r.sale.GetSales)
+	sales.Post("/", r.sale.CreateSale)
+	sales.Delete("/:id", r.sale.DeleteSale)
+	sales.Put("/:id", r.sale.UpdateSale)
 
 	cancellations := api.Group("/cancellations")
 	cancellations.Get("/", r.cancellation.GetCancellations)
