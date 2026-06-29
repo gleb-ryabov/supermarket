@@ -12,8 +12,6 @@ import (
 	"supermarket/internal/services/stock"
 )
 
-// TODO: add swagger doc
-
 // Handler is http request handler for stock.
 type Handler struct {
 	logger *slog.Logger
@@ -40,6 +38,17 @@ func New(
 }
 
 // GetStocks handles HTTP GET request for retrieving stock list.
+//
+// @Summary      Get stocks
+// @Description  Returns a list of stock items filtered by product and search string.
+// @Tags         stock
+// @Produce      json
+// @Param        product_id query string false "Product ID" format(uuid)
+// @Param        search query string false "Search string"
+// @Success      200 {array} dto.StockDTO
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /stock [get]
 func (h *Handler) GetStocks(c *fiber.Ctx) error {
 	const op = "http.handlers.stocks.getStocks"
 

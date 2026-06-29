@@ -40,6 +40,17 @@ func New(
 }
 
 // GetSales handles HTTP GET request for retrieving sales list.
+//
+// @Summary      Get sales
+// @Description  Returns a list of sales filtered by date range.
+// @Tags         sales
+// @Produce      json
+// @Param        date_from query string false "Start date (RFC3339)"
+// @Param        date_to query string false "End date (RFC3339)"
+// @Success      200 {array} dto.SaleDTO
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /sales [get]
 func (h *Handler) GetSales(c *fiber.Ctx) error {
 	const op = "http.handlers.sales.getSales"
 
@@ -77,6 +88,17 @@ func (h *Handler) GetSales(c *fiber.Ctx) error {
 }
 
 // CreateSale handles HTTP POST request for create sale header.
+//
+// @Summary      Create sale
+// @Description  Creates a new sale.
+// @Tags         sales
+// @Accept       json
+// @Produce      json
+// @Param        sale body models.Sale true "Sale"
+// @Success      201 {object} models.Sale
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /sales [post]
 func (h *Handler) CreateSale(c *fiber.Ctx) error {
 	const op = "http.handlers.sales.createSale"
 
@@ -103,6 +125,18 @@ func (h *Handler) CreateSale(c *fiber.Ctx) error {
 }
 
 // UpdateSale handles HTTP PUT request for update sale header.
+//
+// @Summary      Update sale
+// @Description  Updates an existing sale.
+// @Tags         sales
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "Sale ID" format(uuid)
+// @Param        sale body models.Sale true "Sale"
+// @Success      200 {object} response.Response
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /sales/{id} [put]
 func (h *Handler) UpdateSale(c *fiber.Ctx) error {
 	const op = "http.handlers.sales.updateSale"
 
@@ -138,6 +172,16 @@ func (h *Handler) UpdateSale(c *fiber.Ctx) error {
 }
 
 // DeleteSale handles HTTP DELETE request for delete sale header.
+//
+// @Summary      Delete sale
+// @Description  Deletes a sale by ID.
+// @Tags         sales
+// @Produce      json
+// @Param        id path string true "Sale ID" format(uuid)
+// @Success      200 {object} response.Response
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /sales/{id} [delete]
 func (h *Handler) DeleteSale(c *fiber.Ctx) error {
 	const op = "http.handlers.sales.deleteSale"
 

@@ -1,0 +1,1314 @@
+definitions:
+  dto.CancellationDTO:
+    properties:
+      cancellation_id:
+        type: string
+      datetime:
+        type: string
+      product_id:
+        type: string
+      product_name:
+        type: string
+      quantity:
+        type: number
+    type: object
+  dto.PriceDTO:
+    properties:
+      date_end:
+        type: string
+      date_start:
+        type: string
+      discount:
+        type: number
+      full_price:
+        type: number
+      price_id:
+        type: string
+      product_name:
+        type: string
+      total_price:
+        type: number
+    type: object
+  dto.ProductDTO:
+    properties:
+      manufacturer:
+        type: string
+      name:
+        type: string
+      product_id:
+        type: string
+      type_name:
+        type: string
+      volume:
+        type: number
+      weight:
+        type: number
+    type: object
+  dto.ProductSaleDTO:
+    properties:
+      product_id:
+        type: string
+      product_name:
+        type: string
+      product_sales_id:
+        type: string
+      quantity:
+        type: number
+      sale_datetime:
+        type: string
+      sale_id:
+        type: string
+      sale_price:
+        type: number
+    type: object
+  dto.ProductSupplyDTO:
+    properties:
+      delivery_date:
+        type: string
+      price:
+        type: number
+      product_id:
+        type: string
+      product_name:
+        type: string
+      quantity:
+        type: number
+      supplier_name:
+        type: string
+      supply_id:
+        type: string
+    type: object
+  dto.ProductTypeDTO:
+    properties:
+      for_adult:
+        type: boolean
+      name:
+        type: string
+      type_id:
+        type: string
+    type: object
+  dto.SaleDTO:
+    properties:
+      datetime:
+        type: string
+      discount:
+        type: number
+      full_cost:
+        type: number
+      sale_id:
+        type: string
+      total_cost:
+        type: number
+    type: object
+  dto.StockDTO:
+    properties:
+      product_name:
+        type: string
+      quantity:
+        type: number
+      stock_id:
+        type: string
+    type: object
+  dto.SupplierDTO:
+    properties:
+      email:
+        type: string
+      inn:
+        type: string
+      kpp:
+        type: string
+      name:
+        type: string
+      ogrn:
+        type: string
+      phone:
+        type: string
+      supplier_id:
+        type: string
+    type: object
+  models.Cancellation:
+    properties:
+      cancellation_id:
+        type: string
+      datetime:
+        type: string
+      product:
+        $ref: '#/definitions/models.Product'
+      product_id:
+        type: string
+      quantity:
+        type: number
+    type: object
+  models.Price:
+    properties:
+      date_end:
+        type: string
+      date_start:
+        type: string
+      discount:
+        type: number
+      full_price:
+        type: number
+      price_id:
+        type: string
+      product:
+        $ref: '#/definitions/models.Product'
+      product_id:
+        type: string
+      total_price:
+        type: number
+    type: object
+  models.Product:
+    properties:
+      manufacturer:
+        type: string
+      name:
+        type: string
+      product_id:
+        type: string
+      type:
+        $ref: '#/definitions/models.ProductType'
+      type_id:
+        type: string
+      volume:
+        type: number
+      weight:
+        type: number
+    type: object
+  models.ProductSale:
+    properties:
+      product:
+        $ref: '#/definitions/models.Product'
+      product_id:
+        type: string
+      product_sales_id:
+        type: string
+      quantity:
+        type: number
+      sale:
+        $ref: '#/definitions/models.Sale'
+      sale_id:
+        type: string
+      sale_price:
+        type: number
+    type: object
+  models.ProductSupply:
+    properties:
+      delivery_date:
+        type: string
+      price:
+        type: number
+      product:
+        $ref: '#/definitions/models.Product'
+      product_id:
+        type: string
+      quantity:
+        type: number
+      supplier:
+        $ref: '#/definitions/models.Supplier'
+      supplier_id:
+        type: string
+      supply_id:
+        type: string
+    type: object
+  models.ProductType:
+    properties:
+      for_adult:
+        type: boolean
+      name:
+        type: string
+      type_id:
+        type: string
+    type: object
+  models.Sale:
+    properties:
+      datetime:
+        type: string
+      discount:
+        type: number
+      full_cost:
+        type: number
+      sale_id:
+        type: string
+      total_cost:
+        type: number
+    type: object
+  models.Supplier:
+    properties:
+      email:
+        type: string
+      inn:
+        type: string
+      kpp:
+        type: string
+      name:
+        type: string
+      ogrn:
+        type: string
+      phone:
+        type: string
+      supplier_id:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      error:
+        description: Error if response is error
+        type: string
+      status:
+        description: Response status
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /cancellations:
+    get:
+      description: Returns a list of cancellations filtered by product and date range.
+      parameters:
+      - description: Product ID
+        format: uuid
+        in: query
+        name: product_id
+        type: string
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.CancellationDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get cancellations
+      tags:
+      - cancellations
+    post:
+      consumes:
+      - application/json
+      description: Creates a new cancellation.
+      parameters:
+      - description: Cancellation
+        in: body
+        name: cancellation
+        required: true
+        schema:
+          $ref: '#/definitions/models.Cancellation'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/dto.CancellationDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create cancellations
+      tags:
+      - cancellations
+  /cancellations/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a cancellation by ID.
+      parameters:
+      - description: Cancellation ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete cancellation
+      tags:
+      - cancellations
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing cancellation.
+      parameters:
+      - description: Cancellation ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Cancellation
+        in: body
+        name: cancellation
+        required: true
+        schema:
+          $ref: '#/definitions/models.Cancellation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update cancellation
+      tags:
+      - cancellations
+  /prices:
+    get:
+      description: Returns a list of prices filtered by product type and date range.
+      parameters:
+      - description: Product type ID
+        format: uuid
+        in: query
+        name: type_id
+        type: string
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.PriceDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get prices
+      tags:
+      - prices
+    post:
+      consumes:
+      - application/json
+      description: Creates a new price.
+      parameters:
+      - description: Price
+        in: body
+        name: price
+        required: true
+        schema:
+          $ref: '#/definitions/models.Price'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Price'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create price
+      tags:
+      - prices
+  /prices/{id}:
+    delete:
+      description: Deletes a price by ID.
+      parameters:
+      - description: Price ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete price
+      tags:
+      - prices
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing price.
+      parameters:
+      - description: Price ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Price
+        in: body
+        name: price
+        required: true
+        schema:
+          $ref: '#/definitions/models.Price'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update price
+      tags:
+      - prices
+  /product-sales:
+    get:
+      description: Returns a list of products in a sale.
+      parameters:
+      - description: Sale ID
+        format: uuid
+        in: query
+        name: sale_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ProductSaleDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get products in sale
+      tags:
+      - product-sales
+    post:
+      consumes:
+      - application/json
+      description: Adds a product to a sale.
+      parameters:
+      - description: Product sale
+        in: body
+        name: productSale
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductSale'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ProductSale'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create product in sale
+      tags:
+      - product-sales
+  /product-sales/{id}:
+    delete:
+      description: Removes a product from a sale by ID.
+      parameters:
+      - description: Product sale ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete product from sale
+      tags:
+      - product-sales
+    put:
+      consumes:
+      - application/json
+      description: Updates a product in a sale.
+      parameters:
+      - description: Product sale ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product sale
+        in: body
+        name: productSale
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductSale'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update product in sale
+      tags:
+      - product-sales
+  /product-supplies:
+    get:
+      description: Returns a list of product supplies filtered by product, supplier
+        and date range.
+      parameters:
+      - description: Product ID
+        format: uuid
+        in: query
+        name: product_id
+        type: string
+      - description: Supplier ID
+        format: uuid
+        in: query
+        name: supplier_id
+        type: string
+      - description: Start date (RFC3339)
+        in: query
+        name: date_from
+        type: string
+      - description: End date (RFC3339)
+        in: query
+        name: date_to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ProductSupplyDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get product supplies
+      tags:
+      - product-supplies
+    post:
+      consumes:
+      - application/json
+      description: Creates a new product supply.
+      parameters:
+      - description: Product supply
+        in: body
+        name: productSupply
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductSupply'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ProductSupply'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create product supply
+      tags:
+      - product-supplies
+  /product-supplies/{id}:
+    delete:
+      description: Deletes a product supply by ID.
+      parameters:
+      - description: Product supply ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete product supply
+      tags:
+      - product-supplies
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing product supply.
+      parameters:
+      - description: Product supply ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product supply
+        in: body
+        name: productSupply
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductSupply'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update product supply
+      tags:
+      - product-supplies
+  /product-types:
+    get:
+      description: Returns a list of product types filtered by search string and adult
+        flag.
+      parameters:
+      - description: Search string
+        in: query
+        name: search
+        type: string
+      - description: Filter by adult products
+        in: query
+        name: for_adult
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ProductTypeDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get product types
+      tags:
+      - product-types
+    post:
+      consumes:
+      - application/json
+      description: Creates a new product type.
+      parameters:
+      - description: Product type
+        in: body
+        name: productType
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductType'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ProductType'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create product type
+      tags:
+      - product-types
+  /product-types/{id}:
+    delete:
+      description: Deletes a product type by ID.
+      parameters:
+      - description: Product type ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete product type
+      tags:
+      - product-types
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing product type.
+      parameters:
+      - description: Product type ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product type
+        in: body
+        name: productType
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductType'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update product type
+      tags:
+      - product-types
+  /products:
+    get:
+      description: Returns a list of products filtered by type and search string.
+      parameters:
+      - description: Product type ID
+        format: uuid
+        in: query
+        name: type_id
+        type: string
+      - description: Search string
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ProductDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Creates a new product.
+      parameters:
+      - description: Product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create product
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      description: Deletes a product by ID.
+      parameters:
+      - description: Product ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete product
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing product.
+      parameters:
+      - description: Product ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update product
+      tags:
+      - products
+  /sales:
+    get:
+      description: Returns a list of sales filtered by date range.
+      parameters:
+      - description: Start date (RFC3339)
+        in: query
+        name: date_from
+        type: string
+      - description: End date (RFC3339)
+        in: query
+        name: date_to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.SaleDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get sales
+      tags:
+      - sales
+    post:
+      consumes:
+      - application/json
+      description: Creates a new sale.
+      parameters:
+      - description: Sale
+        in: body
+        name: sale
+        required: true
+        schema:
+          $ref: '#/definitions/models.Sale'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Sale'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create sale
+      tags:
+      - sales
+  /sales/{id}:
+    delete:
+      description: Deletes a sale by ID.
+      parameters:
+      - description: Sale ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete sale
+      tags:
+      - sales
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing sale.
+      parameters:
+      - description: Sale ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Sale
+        in: body
+        name: sale
+        required: true
+        schema:
+          $ref: '#/definitions/models.Sale'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update sale
+      tags:
+      - sales
+  /stock:
+    get:
+      description: Returns a list of stock items filtered by product and search string.
+      parameters:
+      - description: Product ID
+        format: uuid
+        in: query
+        name: product_id
+        type: string
+      - description: Search string
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.StockDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get stocks
+      tags:
+      - stock
+  /suppliers:
+    delete:
+      description: Deletes a supplier by ID.
+      parameters:
+      - description: Supplier ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Supplier'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete supplier
+      tags:
+      - suppliers
+    get:
+      description: Returns a list of suppliers filtered by search string.
+      parameters:
+      - description: Search string
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.SupplierDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get suppliers
+      tags:
+      - suppliers
+    post:
+      consumes:
+      - application/json
+      description: Creates a new supplier.
+      parameters:
+      - description: Supplier
+        in: body
+        name: supplier
+        required: true
+        schema:
+          $ref: '#/definitions/models.Supplier'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Supplier'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create supplier
+      tags:
+      - suppliers
+    put:
+      consumes:
+      - application/json
+      description: Updates a supplier by ID.
+      parameters:
+      - description: Supplier ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Supplier
+        in: body
+        name: supplier
+        required: true
+        schema:
+          $ref: '#/definitions/models.Supplier'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Supplier'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update supplier
+      tags:
+      - suppliers
+swagger: "2.0"

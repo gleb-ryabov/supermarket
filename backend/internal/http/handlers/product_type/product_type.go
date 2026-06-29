@@ -14,8 +14,6 @@ import (
 	producttype "supermarket/internal/services/product_type"
 )
 
-// TODO: add swagger doc
-
 // Handler is http request handler for product types.
 type Handler struct {
 	logger *slog.Logger
@@ -42,6 +40,17 @@ func New(
 }
 
 // GetProductTypes handles HTTP GET request for retrieving product types list.
+//
+// @Summary      Get product types
+// @Description  Returns a list of product types filtered by search string and adult flag.
+// @Tags         product-types
+// @Produce      json
+// @Param        search query string false "Search string"
+// @Param        for_adult query bool false "Filter by adult products"
+// @Success      200 {array} dto.ProductTypeDTO
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /product-types [get]
 func (h *Handler) GetProductTypes(c *fiber.Ctx) error {
 	const op = "http.handlers.product_types.getProductTypes"
 
@@ -70,6 +79,17 @@ func (h *Handler) GetProductTypes(c *fiber.Ctx) error {
 }
 
 // CreateProductType handles HTTP POST request for create product type in system.
+//
+// @Summary      Create product type
+// @Description  Creates a new product type.
+// @Tags         product-types
+// @Accept       json
+// @Produce      json
+// @Param        productType body models.ProductType true "Product type"
+// @Success      201 {object} models.ProductType
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /product-types [post]
 func (h *Handler) CreateProductType(c *fiber.Ctx) error {
 	const op = "http.handlers.product_types.createProductType"
 
@@ -96,6 +116,16 @@ func (h *Handler) CreateProductType(c *fiber.Ctx) error {
 }
 
 // DeleteProductType handles HTTP DELETE request for delete product type in system.
+//
+// @Summary      Delete product type
+// @Description  Deletes a product type by ID.
+// @Tags         product-types
+// @Produce      json
+// @Param        id path string true "Product type ID" format(uuid)
+// @Success      200 {object} response.Response
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /product-types/{id} [delete]
 func (h *Handler) DeleteProductType(c *fiber.Ctx) error {
 	op := "http.handlers.product_types.deleteProductType"
 
@@ -122,6 +152,18 @@ func (h *Handler) DeleteProductType(c *fiber.Ctx) error {
 }
 
 // UpdateProductType handles HTTP PUT request for update product type in system.
+//
+// @Summary      Update product type
+// @Description  Updates an existing product type.
+// @Tags         product-types
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "Product type ID" format(uuid)
+// @Param        productType body models.ProductType true "Product type"
+// @Success      200 {object} response.Response
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /product-types/{id} [put]
 func (h *Handler) UpdateProductType(c *fiber.Ctx) error {
 	op := "http.handlers.product_types.updateProductType"
 

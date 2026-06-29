@@ -16,8 +16,6 @@ import (
 	productsupply "supermarket/internal/services/product_supply"
 )
 
-// TODO: add swagger doc
-
 // Handler is http request handler for product supplies.
 type Handler struct {
 	logger *slog.Logger
@@ -44,6 +42,19 @@ func New(
 }
 
 // GetProductSupplies handles HTTP GET request for retrieving product supplies list.
+//
+// @Summary      Get product supplies
+// @Description  Returns a list of product supplies filtered by product, supplier and date range.
+// @Tags         product-supplies
+// @Produce      json
+// @Param        product_id query string false "Product ID" format(uuid)
+// @Param        supplier_id query string false "Supplier ID" format(uuid)
+// @Param        date_from query string false "Start date (RFC3339)"
+// @Param        date_to query string false "End date (RFC3339)"
+// @Success      200 {array} dto.ProductSupplyDTO
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /product-supplies [get]
 func (h *Handler) GetProductSupplies(c *fiber.Ctx) error {
 	const op = "http.handlers.product_supply.getProductSupplies"
 
@@ -98,6 +109,17 @@ func (h *Handler) GetProductSupplies(c *fiber.Ctx) error {
 }
 
 // CreateProductSupply handles HTTP POST request for create product supply in system.
+//
+// @Summary      Create product supply
+// @Description  Creates a new product supply.
+// @Tags         product-supplies
+// @Accept       json
+// @Produce      json
+// @Param        productSupply body models.ProductSupply true "Product supply"
+// @Success      201 {object} models.ProductSupply
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /product-supplies [post]
 func (h *Handler) CreateProductSupply(c *fiber.Ctx) error {
 	const op = "http.handlers.product_supply.createProductSupply"
 
@@ -124,6 +146,17 @@ func (h *Handler) CreateProductSupply(c *fiber.Ctx) error {
 }
 
 // DeleteProductSupply handles HTTP DELETE request for delete product supply in system.
+//
+// @Summary      Delete product supply
+// @Description  Deletes a product supply by ID.
+// @Tags         product-supplies
+// @Produce      json
+// @Param        id path string true "Product supply ID" format(uuid)
+// @Success      200 {object} response.Response
+// @Failure      400 {object} response.Response
+// @Failure      409 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /product-supplies/{id} [delete]
 func (h *Handler) DeleteProductSupply(c *fiber.Ctx) error {
 	op := "http.handlers.product_supply.deleteProductSupply"
 
@@ -154,6 +187,19 @@ func (h *Handler) DeleteProductSupply(c *fiber.Ctx) error {
 }
 
 // UpdateProductSupply handles HTTP PUT request for update product supply in system.
+//
+// @Summary      Update product supply
+// @Description  Updates an existing product supply.
+// @Tags         product-supplies
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "Product supply ID" format(uuid)
+// @Param        productSupply body models.ProductSupply true "Product supply"
+// @Success      200 {object} response.Response
+// @Failure      400 {object} response.Response
+// @Failure      409 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /product-supplies/{id} [put]
 func (h *Handler) UpdateProductSupply(c *fiber.Ctx) error {
 	op := "http.handlers.product_supply.updateProductSupply"
 

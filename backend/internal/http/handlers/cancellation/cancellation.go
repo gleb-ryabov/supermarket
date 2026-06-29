@@ -14,8 +14,6 @@ import (
 	"supermarket/internal/services/cancellation"
 )
 
-// TODO: add swagger doc
-
 const layoutDate = "2006-01-02" // layout for parse date.
 
 // Handler is http request handler for cancellation.
@@ -44,6 +42,18 @@ func New(
 }
 
 // GetCancellations handles HTTP GET request for retrieving cancellations list.
+//
+// @Summary      Get cancellations
+// @Description  Returns a list of cancellations filtered by product and date range.
+// @Tags         cancellations
+// @Produce      json
+// @Param        product_id query string false "Product ID" format(uuid)
+// @Param        date_from  query string false "Start date (YYYY-MM-DD)"
+// @Param        date_to    query string false "End date (YYYY-MM-DD)"
+// @Success      200 {array} dto.CancellationDTO
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /cancellations [get].
 func (h *Handler) GetCancellations(c *fiber.Ctx) error {
 	const op = "http.handlers.cancellation.getCancellations"
 
@@ -90,6 +100,17 @@ func (h *Handler) GetCancellations(c *fiber.Ctx) error {
 }
 
 // CreateCancellation handles HTTP POST request for create cancellation in system.
+//
+// @Summary      Create cancellations
+// @Description  Creates a new cancellation.
+// @Tags         cancellations
+// @Accept       json
+// @Produce      json
+// @Param        cancellation body models.Cancellation true "Cancellation"
+// @Success      201 {array} dto.CancellationDTO
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /cancellations [post].
 func (h *Handler) CreateCancellation(c *fiber.Ctx) error {
 	const op = "http.handlers.cancellations.createCancellation"
 
@@ -116,6 +137,17 @@ func (h *Handler) CreateCancellation(c *fiber.Ctx) error {
 }
 
 // DeleteCancellation handles HTTP DELETE request for delete cancellation in system.
+//
+// @Summary      Delete cancellation
+// @Description  Deletes a cancellation by ID.
+// @Tags         cancellations
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "Cancellation ID" format(uuid)
+// @Success      200 {object} response.Response
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /cancellations/{id} [delete]
 func (h *Handler) DeleteCancellation(c *fiber.Ctx) error {
 	op := "http.handlers.cancellations.deleteCancellation"
 
@@ -142,6 +174,18 @@ func (h *Handler) DeleteCancellation(c *fiber.Ctx) error {
 }
 
 // UpdateCancellation handles HTTP PUT request for update cancellation in system.
+//
+// @Summary      Update cancellation
+// @Description  Updates an existing cancellation.
+// @Tags         cancellations
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "Cancellation ID" format(uuid)
+// @Param        cancellation body models.Cancellation true "Cancellation"
+// @Success      200 {object} response.Response
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /cancellations/{id} [put]
 func (h *Handler) UpdateCancellation(c *fiber.Ctx) error {
 	op := "http.handlers.cancellations.updateCancellation"
 

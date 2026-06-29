@@ -13,8 +13,6 @@ import (
 	"supermarket/internal/services/supplier"
 )
 
-// TODO: add swagger doc
-
 // Handler is http request handler for suppliers.
 type Handler struct {
 	logger *slog.Logger
@@ -41,6 +39,15 @@ func New(
 }
 
 // GetSuppliers handles HTTP GET request for retrieving suppliers list.
+//
+// @Summary      Get suppliers
+// @Description  Returns a list of suppliers filtered by search string.
+// @Tags         suppliers
+// @Produce      json
+// @Param        search query string false "Search string"
+// @Success      200 {array} dto.SupplierDTO
+// @Failure      500 {object} response.Response
+// @Router       /suppliers [get]
 func (h *Handler) GetSuppliers(c *fiber.Ctx) error {
 	const op = "http.handlers.suppliers.getSuppliers"
 
@@ -63,6 +70,17 @@ func (h *Handler) GetSuppliers(c *fiber.Ctx) error {
 }
 
 // CreateSupplier handles HTTP POST request for create supplier in system.
+//
+// @Summary      Create supplier
+// @Description  Creates a new supplier.
+// @Tags         suppliers
+// @Accept       json
+// @Produce      json
+// @Param        supplier body models.Supplier true "Supplier"
+// @Success      201 {object} models.Supplier
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /suppliers [post]
 func (h *Handler) CreateSupplier(c *fiber.Ctx) error {
 	const op = "http.handlers.suppliers.createSupplier"
 
@@ -89,6 +107,16 @@ func (h *Handler) CreateSupplier(c *fiber.Ctx) error {
 }
 
 // DeleteSupplier handles HTTP DELETE request for delete supplier in system.
+//
+// @Summary      Delete supplier
+// @Description  Deletes a supplier by ID.
+// @Tags         suppliers
+// @Produce      json
+// @Param        id path string true "Supplier ID" format(uuid)
+// @Success      201 {object} models.Supplier
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /suppliers [delete]
 func (h *Handler) DeleteSupplier(c *fiber.Ctx) error {
 	const op = "http.handlers.suppliers.deleteSupplier"
 
@@ -115,6 +143,18 @@ func (h *Handler) DeleteSupplier(c *fiber.Ctx) error {
 }
 
 // UpdateSupplier handles HTTP PUT request for update supplier in system.
+//
+// @Summary      Update supplier
+// @Description  Updates a supplier by ID.
+// @Tags         suppliers
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "Supplier ID" format(uuid)
+// @Param        supplier body models.Supplier true "Supplier"
+// @Success      201 {object} models.Supplier
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /suppliers [put]
 func (h *Handler) UpdateSupplier(c *fiber.Ctx) error {
 	const op = "http.handlers.suppliers.updateSupplier"
 

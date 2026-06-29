@@ -14,8 +14,6 @@ import (
 	productsale "supermarket/internal/services/product_sale"
 )
 
-// TODO: add swagger doc
-
 // Handler is http request handler for product in sale.
 type Handler struct {
 	logger *slog.Logger
@@ -42,6 +40,16 @@ func New(
 }
 
 // GetProductsInSale handles HTTP GET request for retrieving product in sale list.
+//
+// @Summary      Get products in sale
+// @Description  Returns a list of products in a sale.
+// @Tags         product-sales
+// @Produce      json
+// @Param        sale_id query string true "Sale ID" format(uuid)
+// @Success      200 {array} dto.ProductSaleDTO
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /product-sales [get]
 func (h *Handler) GetProductsInSale(c *fiber.Ctx) error {
 	const op = "http.handlers.product_sale.getProductsInSale"
 
@@ -69,6 +77,17 @@ func (h *Handler) GetProductsInSale(c *fiber.Ctx) error {
 }
 
 // CreateProductInSale handles HTTP POST request for create product in system.
+//
+// @Summary      Create product in sale
+// @Description  Adds a product to a sale.
+// @Tags         product-sales
+// @Accept       json
+// @Produce      json
+// @Param        productSale body models.ProductSale true "Product sale"
+// @Success      201 {object} models.ProductSale
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /product-sales [post]
 func (h *Handler) CreateProductInSale(c *fiber.Ctx) error {
 	const op = "http.handlers.product_sale.createProductInSale"
 
@@ -95,6 +114,16 @@ func (h *Handler) CreateProductInSale(c *fiber.Ctx) error {
 }
 
 // DeleteProductInSale handles HTTP DELETE request for delete product in system.
+//
+// @Summary      Delete product from sale
+// @Description  Removes a product from a sale by ID.
+// @Tags         product-sales
+// @Produce      json
+// @Param        id path string true "Product sale ID" format(uuid)
+// @Success      200 {object} response.Response
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /product-sales/{id} [delete]
 func (h *Handler) DeleteProductInSale(c *fiber.Ctx) error {
 	op := "http.handlers.product_sale.deleteProductInSale"
 
@@ -121,6 +150,18 @@ func (h *Handler) DeleteProductInSale(c *fiber.Ctx) error {
 }
 
 // UpdateProductInSale handles HTTP PUT request for update product in system.
+//
+// @Summary      Update product in sale
+// @Description  Updates a product in a sale.
+// @Tags         product-sales
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "Product sale ID" format(uuid)
+// @Param        productSale body models.ProductSale true "Product sale"
+// @Success      200 {object} response.Response
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /product-sales/{id} [put]
 func (h *Handler) UpdateProductInSale(c *fiber.Ctx) error {
 	op := "http.handlers.product_sale.updateProductInSale"
 

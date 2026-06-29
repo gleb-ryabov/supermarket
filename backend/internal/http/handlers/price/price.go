@@ -14,8 +14,6 @@ import (
 	"supermarket/internal/services/price"
 )
 
-// TODO: add swagger doc
-
 const layoutDate = "2006-01-02" // layout for parse date.
 
 // Handler is http request handler for price.
@@ -44,6 +42,18 @@ func New(
 }
 
 // GetPrices handles HTTP GET request for retrieving prices list.
+//
+// @Summary      Get prices
+// @Description  Returns a list of prices filtered by product type and date range.
+// @Tags         prices
+// @Produce      json
+// @Param        type_id query string false "Product type ID" format(uuid)
+// @Param        date_from query string false "Start date (YYYY-MM-DD)"
+// @Param        date_to query string false "End date (YYYY-MM-DD)"
+// @Success      200 {array} dto.PriceDTO
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /prices [get]
 func (h *Handler) GetPrices(c *fiber.Ctx) error {
 	const op = "http.handlers.price.getPrices"
 
@@ -89,6 +99,17 @@ func (h *Handler) GetPrices(c *fiber.Ctx) error {
 }
 
 // CreatePrice handles HTTP POST request for create price in system.
+//
+// @Summary      Create price
+// @Description  Creates a new price.
+// @Tags         prices
+// @Accept       json
+// @Produce      json
+// @Param        price body models.Price true "Price"
+// @Success      201 {object} models.Price
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /prices [post]
 func (h *Handler) CreatePrice(c *fiber.Ctx) error {
 	const op = "http.handlers.prices.createPrice"
 
@@ -115,6 +136,16 @@ func (h *Handler) CreatePrice(c *fiber.Ctx) error {
 }
 
 // DeletePrice handles HTTP DELETE request for delete price in system.
+//
+// @Summary      Delete price
+// @Description  Deletes a price by ID.
+// @Tags         prices
+// @Produce      json
+// @Param        id path string true "Price ID" format(uuid)
+// @Success      200 {object} response.Response
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /prices/{id} [delete]
 func (h *Handler) DeletePrice(c *fiber.Ctx) error {
 	op := "http.handlers.prices.deletePrice"
 
@@ -141,6 +172,18 @@ func (h *Handler) DeletePrice(c *fiber.Ctx) error {
 }
 
 // UpdatePrice handles HTTP PUT request for update price in system.
+//
+// @Summary      Update price
+// @Description  Updates an existing price.
+// @Tags         prices
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "Price ID" format(uuid)
+// @Param        price body models.Price true "Price"
+// @Success      200 {object} response.Response
+// @Failure      400 {object} response.Response
+// @Failure      500 {object} response.Response
+// @Router       /prices/{id} [put]
 func (h *Handler) UpdatePrice(c *fiber.Ctx) error {
 	op := "http.handlers.prices.updatePrice"
 
