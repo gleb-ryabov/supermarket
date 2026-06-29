@@ -74,7 +74,6 @@ func (s *service) IncreaseStock(
 }
 
 // IncreaseStock updates the quantity of a stock item by its product id. Sets += for count.
-// Use transactions.
 // If not found creates a new item.
 func IncreaseStock(
 	ctx context.Context,
