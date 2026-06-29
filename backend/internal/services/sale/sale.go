@@ -10,16 +10,16 @@ import (
 	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
 	"supermarket/internal/repository/sale"
+	"supermarket/internal/repository/transactions"
 	productsale "supermarket/internal/services/product_sale"
 )
-
-// TODO: add transactions
 
 // service provides business logic for sales.
 type service struct {
 	logger *slog.Logger
 
 	salesR sale.Repository
+	uow    transactions.UnitOfWork
 
 	productSalesS productsale.Service
 }
@@ -28,11 +28,13 @@ type service struct {
 func New(
 	logger *slog.Logger,
 	salesR sale.Repository,
+	uow transactions.UnitOfWork,
 	productSalesS productsale.Service,
 ) Service {
 	return &service{
 		logger:        logger,
 		salesR:        salesR,
+		uow:           uow,
 		productSalesS: productSalesS,
 	}
 }
@@ -110,17 +112,25 @@ func (s *service) DeleteSale(ctx context.Context, id uuid.UUID) error {
 
 	log := s.logger.With("op", op).With("id", id)
 
-	if err := s.productSalesS.DeleteProductsBySaleID(ctx, id); err != nil {
-		log.Error("failed to delete products from sale", slog.Any("error", err))
+	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
+		if err := repos.ProductSale.DeleteBySale(ctx, id); err != nil {
+			log.Error("failed to delete products from sale", slog.Any("error", err))
 
-		return err
-	}
+			return err
+		}
 
-	if err := s.salesR.Delete(ctx, id); err != nil {
-		log.Error("failed to delete sale", slog.Any("error", err))
+		if err := repos.Stock.UpdateStockOnDeleteSale(ctx, id); err != nil {
+			log.Error("failed to set count stock", slog.Any("error", err))
 
-		return err
-	}
+			return err
+		}
 
-	return nil
+		if err := repos.Sale.Delete(ctx, id); err != nil {
+			log.Error("failed to delete sale", slog.Any("error", err))
+
+			return err
+		}
+
+		return nil
+	})
 }

@@ -29,6 +29,7 @@ import (
 	saleRepo "supermarket/internal/repository/sale/gorm"
 	stockRepo "supermarket/internal/repository/stock/gorm"
 	supplierRepo "supermarket/internal/repository/supplier/gorm"
+	transactions "supermarket/internal/repository/transactions/gorm"
 	cancellationService "supermarket/internal/services/cancellation"
 	priceService "supermarket/internal/services/price"
 	productService "supermarket/internal/services/product"
@@ -82,6 +83,7 @@ func New(ctx context.Context) (*App, error) {
 // initApp creates dependences, fiber app and setups router.
 func initApp(l *slog.Logger, db *postgres.Storage) *fiber.App {
 	// repositories
+	unitOfWork := transactions.New(db.DB)
 	productTypeR := producttypeRepo.New(db.DB)
 	productR := productRepo.New(db.DB)
 	priceR := priceRepo.New(db.DB)
@@ -98,10 +100,10 @@ func initApp(l *slog.Logger, db *postgres.Storage) *fiber.App {
 	priceS := priceService.New(l, priceR)
 	supplierS := supplierService.New(l, supplierR)
 	stockS := stockService.New(l, stockR)
-	productSupplyS := productSupplyService.New(l, productSupplyR, stockS)
-	cancellationS := cancellationService.New(l, cancellationR, stockS)
-	productSaleS := productSaleService.New(l, productSaleR, stockS)
-	saleS := saleService.New(l, saleR, productSaleS)
+	productSupplyS := productSupplyService.New(l, productSupplyR, unitOfWork, stockS)
+	cancellationS := cancellationService.New(l, cancellationR, unitOfWork, stockS)
+	productSaleS := productSaleService.New(l, productSaleR, unitOfWork, stockS)
+	saleS := saleService.New(l, saleR, unitOfWork, productSaleS)
 
 	readTimeout := time.Second * time.Duration(viper.GetInt(config.ReadTimeout))
 	writeTimeout := time.Second * time.Duration(viper.GetInt(config.WriteTimeout))

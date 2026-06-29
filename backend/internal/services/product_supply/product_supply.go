@@ -11,16 +11,16 @@ import (
 	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
 	productsupply "supermarket/internal/repository/product_supply"
+	"supermarket/internal/repository/transactions"
 	"supermarket/internal/services/stock"
 )
-
-// TODO: add transactions
 
 // service provides business logic for product supplies.
 type service struct {
 	logger *slog.Logger
 
 	productSupplyR productsupply.Repository
+	uow            transactions.UnitOfWork
 
 	stockS stock.Service
 }
@@ -29,11 +29,13 @@ type service struct {
 func New(
 	logger *slog.Logger,
 	productSupplyR productsupply.Repository,
+	uow transactions.UnitOfWork,
 	stockS stock.Service,
 ) Service {
 	return &service{
 		logger:         logger,
 		productSupplyR: productSupplyR,
+		uow:            uow,
 		stockS:         stockS,
 	}
 }
@@ -79,25 +81,33 @@ func (s *service) CreateProductSupply(ctx context.Context, ps *models.ProductSup
 
 	ps.ID = uuid.New()
 
-	if err := s.productSupplyR.Create(ctx, ps); err != nil {
-		log.Error("failed to create product supply",
-			slog.Any("error", err),
-			slog.Any("productSupply", *ps),
-		)
+	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
+		if err := repos.ProductSupply.Create(ctx, ps); err != nil {
+			log.Error("failed to create product supply",
+				slog.Any("error", err),
+				slog.Any("productSupply", *ps),
+			)
 
-		return err
-	}
+			return err
+		}
 
-	if err := s.stockS.IncreaseStock(ctx, ps.ProductID, ps.Quantity); err != nil {
-		log.Error("failed to set count stock",
-			slog.Any("error", err),
-			slog.Any("productSupply", *ps),
-		)
+		if err := stock.IncreaseStock(
+			ctx,
+			s.logger,
+			repos.Stock,
+			ps.ProductID,
+			ps.Quantity,
+		); err != nil {
+			log.Error("failed to set count stock",
+				slog.Any("error", err),
+				slog.Any("productSupply", *ps),
+			)
 
-		return err
-	}
+			return err
+		}
 
-	return nil
+		return nil
+	})
 }
 
 // DeleteProductSupply deletes product supply in the db by id.
@@ -107,19 +117,21 @@ func (s *service) DeleteProductSupply(ctx context.Context, id uuid.UUID) error {
 	log := s.logger.With("op", op).
 		With("productSupplyID", id)
 
-	if err := s.stockS.UpdateStockByProductSupply(ctx, id, decimal.Zero); err != nil {
-		log.Error("failed to set count stock", slog.Any("error", err))
+	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
+		if err := repos.Stock.UpdateStockByProductSupply(ctx, id, decimal.Zero); err != nil {
+			log.Error("failed to set count stock", slog.Any("error", err))
 
-		return err
-	}
+			return err
+		}
 
-	if err := s.productSupplyR.Delete(ctx, id); err != nil {
-		log.Error("failed to delete product supplies", slog.Any("error", err))
+		if err := repos.ProductSupply.Delete(ctx, id); err != nil {
+			log.Error("failed to delete product supplies", slog.Any("error", err))
 
-		return err
-	}
+			return err
+		}
 
-	return nil
+		return nil
+	})
 }
 
 // UpdateProductSupply deletes product supply in the db by id.
@@ -128,23 +140,25 @@ func (s *service) UpdateProductSupply(ctx context.Context, ps *models.ProductSup
 
 	log := s.logger.With("op", op)
 
-	if err := s.stockS.UpdateStockByProductSupply(ctx, ps.ID, ps.Quantity); err != nil {
-		log.Error("failed to set count stock",
-			slog.Any("error", err),
-			slog.Any("productSupply", *ps),
-		)
+	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
+		if err := repos.Stock.UpdateStockByProductSupply(ctx, ps.ID, ps.Quantity); err != nil {
+			log.Error("failed to set count stock",
+				slog.Any("error", err),
+				slog.Any("productSupply", *ps),
+			)
 
-		return err
-	}
+			return err
+		}
 
-	if err := s.productSupplyR.Update(ctx, ps); err != nil {
-		log.Error("failed to update product supply",
-			slog.Any("error", err),
-			slog.Any("productSupply", *ps),
-		)
+		if err := repos.ProductSupply.Update(ctx, ps); err != nil {
+			log.Error("failed to update product supply",
+				slog.Any("error", err),
+				slog.Any("productSupply", *ps),
+			)
 
-		return err
-	}
+			return err
+		}
 
-	return nil
+		return nil
+	})
 }

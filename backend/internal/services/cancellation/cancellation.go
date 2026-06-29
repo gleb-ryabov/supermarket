@@ -11,16 +11,16 @@ import (
 	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
 	"supermarket/internal/repository/cancellation"
+	"supermarket/internal/repository/transactions"
 	"supermarket/internal/services/stock"
 )
-
-// TODO: add transactions
 
 // service provides business logic for cancellations.
 type service struct {
 	logger *slog.Logger
 
 	cancellationR cancellation.Repository
+	uow           transactions.UnitOfWork
 
 	stockS stock.Service
 }
@@ -29,11 +29,13 @@ type service struct {
 func New(
 	logger *slog.Logger,
 	cancellationR cancellation.Repository,
+	uow transactions.UnitOfWork,
 	stockS stock.Service,
 ) Service {
 	return &service{
 		logger:        logger,
 		cancellationR: cancellationR,
+		uow:           uow,
 		stockS:        stockS,
 	}
 }
@@ -77,25 +79,33 @@ func (s *service) CreateCancellation(ctx context.Context, cancellation *models.C
 
 	cancellation.ID = uuid.New()
 
-	if err := s.cancellationR.Create(ctx, cancellation); err != nil {
-		log.Error("failed to create cancellation",
-			slog.Any("error", err),
-			slog.Any("cancellation", cancellation),
-		)
+	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
+		if err := repos.Cancellation.Create(ctx, cancellation); err != nil {
+			log.Error("failed to create cancellation",
+				slog.Any("error", err),
+				slog.Any("cancellation", cancellation),
+			)
 
-		return err
-	}
+			return err
+		}
 
-	if err := s.stockS.IncreaseStock(ctx, cancellation.ProductID, cancellation.Quantity.Neg()); err != nil {
-		log.Error("failed to set count stock",
-			slog.Any("error", err),
-			slog.Any("cancellation", *cancellation),
-		)
+		if err := stock.IncreaseStock(
+			ctx,
+			s.logger,
+			repos.Stock,
+			cancellation.ProductID,
+			cancellation.Quantity.Neg(),
+		); err != nil {
+			log.Error("failed to set count stock",
+				slog.Any("error", err),
+				slog.Any("cancellation", *cancellation),
+			)
 
-		return err
-	}
+			return err
+		}
 
-	return nil
+		return nil
+	})
 }
 
 // DeleteCancellation deletes cancellation in the db by id.
@@ -105,19 +115,21 @@ func (s *service) DeleteCancellation(ctx context.Context, id uuid.UUID) error {
 	log := s.logger.With("op", op).
 		With("id", id)
 
-	if err := s.stockS.UpdateStockByCancellation(ctx, id, decimal.Zero); err != nil {
-		log.Error("failed to set count stock", slog.Any("error", err))
+	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
+		if err := repos.Stock.UpdateStockByCancellation(ctx, id, decimal.Zero); err != nil {
+			log.Error("failed to set count stock", slog.Any("error", err))
 
-		return err
-	}
+			return err
+		}
 
-	if err := s.cancellationR.Delete(ctx, id); err != nil {
-		log.Error("failed to delete cancellation", slog.Any("error", err))
+		if err := repos.Cancellation.Delete(ctx, id); err != nil {
+			log.Error("failed to delete cancellation", slog.Any("error", err))
 
-		return err
-	}
+			return err
+		}
 
-	return nil
+		return nil
+	})
 }
 
 // UpdateCancellation updates cancellation in the db.
@@ -126,24 +138,25 @@ func (s *service) UpdateCancellation(ctx context.Context, cancellation *models.C
 
 	log := s.logger.With("op", op)
 
-	if err := s.stockS.UpdateStockByCancellation(ctx, cancellation.ID, cancellation.Quantity); err != nil {
-		log.Error("failed to set count stock",
-			slog.Any("error", err),
-			slog.Any("cancellation", *cancellation),
-		)
+	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
+		if err := repos.Stock.UpdateStockByCancellation(ctx, cancellation.ID, cancellation.Quantity); err != nil {
+			log.Error("failed to set count stock",
+				slog.Any("error", err),
+				slog.Any("cancellation", *cancellation),
+			)
 
-		return err
-	}
+			return err
+		}
 
-	if err := s.cancellationR.Update(ctx, cancellation); err != nil {
-		log.Error("failed to update cancellation",
-			slog.Any("error", err),
-			slog.Any("cancellation", *cancellation),
-		)
+		if err := repos.Cancellation.Update(ctx, cancellation); err != nil {
+			log.Error("failed to update cancellation",
+				slog.Any("error", err),
+				slog.Any("cancellation", *cancellation),
+			)
 
-		return err
-	}
-	log.Debug(" update")
+			return err
+		}
 
-	return nil
+		return nil
+	})
 }
