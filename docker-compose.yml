@@ -15,22 +15,37 @@ services:
     build: 
       context: ./backend
       target: migrate
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
     depends_on:
       - db
   api: 
     build: 
       context: ./backend
       target: api
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      LOG_LEVEL: ${LOG_LEVEL}
     depends_on:
       - db 
       - migrate
     ports:
-      - "3000:3000"
+      - "8080:8080"
   frontend:
     build:
       context: ./frontend
+    environment:
+     API_BASE_URL: http://localhost:8080/api
     ports:
-      - "80:80"
+    - "80:80"
     depends_on:
       - api
 volumes:

@@ -14,10 +14,6 @@ const (
 	defaultWriteTimeout = 10
 )
 
-var (
-	errConfigNotFound = errors.New("configuration file not found")
-)
-
 // Init - initialize viper configuration.
 func Init() error {
 	setDefaultsConfig()
@@ -30,7 +26,7 @@ func Init() error {
 	if err := viper.ReadInConfig(); err != nil {
 		var pe *fs.PathError
 		if errors.As(err, &pe) {
-			return errConfigNotFound
+			return nil
 		}
 
 		return fmt.Errorf("failed to read configuration file: %w", err)
@@ -49,7 +45,7 @@ func setDefaultsConfig() {
 	viper.SetDefault(DBPassword, "postgres")
 	viper.SetDefault(DBName, "supermarket")
 	viper.SetDefault(DBSSL, "disable")
-	viper.SetDefault(HTTPAddress, "localhost")
+	viper.SetDefault(HTTPAddress, "0.0.0.0")
 	viper.SetDefault(HTTPPort, "8080")
 	viper.SetDefault(ReadTimeout, defaultReadTimeout)
 	viper.SetDefault(WriteTimeout, defaultWriteTimeout)

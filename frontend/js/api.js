@@ -1,4 +1,4 @@
-const API_BASE = localStorage.getItem('API_BASE') || 'http://localhost:8080/api';
+const API_BASE = window.APP_CONFIG.API_BASE_URL;
 
 async function apiRequest(path, options = {}) {
     const response = await fetch(`${API_BASE}${path}`, {
