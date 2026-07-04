@@ -147,7 +147,7 @@ func (h *Handler) CreateCancellation(c *fiber.Ctx) error {
 // @Success      200 {object} response.Response
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /cancellations/{id} [delete]
+// @Router       /cancellations/{id} [delete].
 func (h *Handler) DeleteCancellation(c *fiber.Ctx) error {
 	op := "http.handlers.cancellations.deleteCancellation"
 
@@ -185,7 +185,7 @@ func (h *Handler) DeleteCancellation(c *fiber.Ctx) error {
 // @Success      200 {object} response.Response
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /cancellations/{id} [put]
+// @Router       /cancellations/{id} [put].
 func (h *Handler) UpdateCancellation(c *fiber.Ctx) error {
 	op := "http.handlers.cancellations.updateCancellation"
 

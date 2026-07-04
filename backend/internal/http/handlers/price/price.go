@@ -53,7 +53,7 @@ func New(
 // @Success      200 {array} dto.PriceDTO
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /prices [get]
+// @Router       /prices [get].
 func (h *Handler) GetPrices(c *fiber.Ctx) error {
 	const op = "http.handlers.price.getPrices"
 
@@ -109,7 +109,7 @@ func (h *Handler) GetPrices(c *fiber.Ctx) error {
 // @Success      201 {object} models.Price
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /prices [post]
+// @Router       /prices [post].
 func (h *Handler) CreatePrice(c *fiber.Ctx) error {
 	const op = "http.handlers.prices.createPrice"
 
@@ -145,7 +145,7 @@ func (h *Handler) CreatePrice(c *fiber.Ctx) error {
 // @Success      200 {object} response.Response
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /prices/{id} [delete]
+// @Router       /prices/{id} [delete].
 func (h *Handler) DeletePrice(c *fiber.Ctx) error {
 	op := "http.handlers.prices.deletePrice"
 
@@ -183,7 +183,7 @@ func (h *Handler) DeletePrice(c *fiber.Ctx) error {
 // @Success      200 {object} response.Response
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /prices/{id} [put]
+// @Router       /prices/{id} [put].
 func (h *Handler) UpdatePrice(c *fiber.Ctx) error {
 	op := "http.handlers.prices.updatePrice"
 

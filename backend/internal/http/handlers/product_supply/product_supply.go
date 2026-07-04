@@ -54,7 +54,7 @@ func New(
 // @Success      200 {array} dto.ProductSupplyDTO
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /product-supplies [get]
+// @Router       /product-supplies [get].
 func (h *Handler) GetProductSupplies(c *fiber.Ctx) error {
 	const op = "http.handlers.product_supply.getProductSupplies"
 
@@ -119,7 +119,7 @@ func (h *Handler) GetProductSupplies(c *fiber.Ctx) error {
 // @Success      201 {object} models.ProductSupply
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /product-supplies [post]
+// @Router       /product-supplies [post].
 func (h *Handler) CreateProductSupply(c *fiber.Ctx) error {
 	const op = "http.handlers.product_supply.createProductSupply"
 
@@ -156,7 +156,7 @@ func (h *Handler) CreateProductSupply(c *fiber.Ctx) error {
 // @Failure      400 {object} response.Response
 // @Failure      409 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /product-supplies/{id} [delete]
+// @Router       /product-supplies/{id} [delete].
 func (h *Handler) DeleteProductSupply(c *fiber.Ctx) error {
 	op := "http.handlers.product_supply.deleteProductSupply"
 
@@ -199,7 +199,7 @@ func (h *Handler) DeleteProductSupply(c *fiber.Ctx) error {
 // @Failure      400 {object} response.Response
 // @Failure      409 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /product-supplies/{id} [put]
+// @Router       /product-supplies/{id} [put].
 func (h *Handler) UpdateProductSupply(c *fiber.Ctx) error {
 	op := "http.handlers.product_supply.updateProductSupply"
 

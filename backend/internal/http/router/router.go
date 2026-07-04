@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 
 	"supermarket/internal/http/handlers/cancellation"
 	"supermarket/internal/http/handlers/price"
@@ -61,6 +62,8 @@ func New(
 }
 
 // Setup - configure router.
+//
+//nolint:funlen
 func (r *Router) Setup() {
 	r.app.Use(recover.New())
 	r.app.Use(requestid.New())
@@ -120,6 +123,9 @@ func (r *Router) Setup() {
 	cancellations.Delete("/:id", r.cancellation.DeleteCancellation)
 	cancellations.Put("/:id", r.cancellation.UpdateCancellation)
 
+	r.app.Get("/swagger/*", fiberSwagger.WrapHandler)
+
+	// TODO: add reports
 	reports := r.app.Group("/reports")
 	_ = reports
 }

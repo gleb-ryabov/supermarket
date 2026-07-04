@@ -48,7 +48,7 @@ func New(
 // @Success      200 {array} dto.StockDTO
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /stock [get]
+// @Router       /stock [get].
 func (h *Handler) GetStocks(c *fiber.Ctx) error {
 	const op = "http.handlers.stocks.getStocks"
 

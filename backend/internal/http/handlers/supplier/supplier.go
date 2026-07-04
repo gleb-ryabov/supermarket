@@ -47,7 +47,7 @@ func New(
 // @Param        search query string false "Search string"
 // @Success      200 {array} dto.SupplierDTO
 // @Failure      500 {object} response.Response
-// @Router       /suppliers [get]
+// @Router       /suppliers [get].
 func (h *Handler) GetSuppliers(c *fiber.Ctx) error {
 	const op = "http.handlers.suppliers.getSuppliers"
 
@@ -80,7 +80,7 @@ func (h *Handler) GetSuppliers(c *fiber.Ctx) error {
 // @Success      201 {object} models.Supplier
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /suppliers [post]
+// @Router       /suppliers [post].
 func (h *Handler) CreateSupplier(c *fiber.Ctx) error {
 	const op = "http.handlers.suppliers.createSupplier"
 
@@ -116,7 +116,7 @@ func (h *Handler) CreateSupplier(c *fiber.Ctx) error {
 // @Success      201 {object} models.Supplier
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /suppliers [delete]
+// @Router       /suppliers [delete].
 func (h *Handler) DeleteSupplier(c *fiber.Ctx) error {
 	const op = "http.handlers.suppliers.deleteSupplier"
 
@@ -154,7 +154,7 @@ func (h *Handler) DeleteSupplier(c *fiber.Ctx) error {
 // @Success      201 {object} models.Supplier
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /suppliers [put]
+// @Router       /suppliers [put].
 func (h *Handler) UpdateSupplier(c *fiber.Ctx) error {
 	const op = "http.handlers.suppliers.updateSupplier"
 

@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	_ "supermarket/docs"
 	"supermarket/internal/app"
 	"supermarket/internal/config"
 )

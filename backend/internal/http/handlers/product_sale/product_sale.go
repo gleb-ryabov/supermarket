@@ -49,7 +49,7 @@ func New(
 // @Success      200 {array} dto.ProductSaleDTO
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /product-sales [get]
+// @Router       /product-sales [get].
 func (h *Handler) GetProductsInSale(c *fiber.Ctx) error {
 	const op = "http.handlers.product_sale.getProductsInSale"
 
@@ -87,7 +87,7 @@ func (h *Handler) GetProductsInSale(c *fiber.Ctx) error {
 // @Success      201 {object} models.ProductSale
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /product-sales [post]
+// @Router       /product-sales [post].
 func (h *Handler) CreateProductInSale(c *fiber.Ctx) error {
 	const op = "http.handlers.product_sale.createProductInSale"
 
@@ -123,7 +123,7 @@ func (h *Handler) CreateProductInSale(c *fiber.Ctx) error {
 // @Success      200 {object} response.Response
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /product-sales/{id} [delete]
+// @Router       /product-sales/{id} [delete].
 func (h *Handler) DeleteProductInSale(c *fiber.Ctx) error {
 	op := "http.handlers.product_sale.deleteProductInSale"
 
@@ -161,7 +161,7 @@ func (h *Handler) DeleteProductInSale(c *fiber.Ctx) error {
 // @Success      200 {object} response.Response
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /product-sales/{id} [put]
+// @Router       /product-sales/{id} [put].
 func (h *Handler) UpdateProductInSale(c *fiber.Ctx) error {
 	op := "http.handlers.product_sale.updateProductInSale"
 

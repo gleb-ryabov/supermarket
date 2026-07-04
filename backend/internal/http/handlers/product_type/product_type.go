@@ -50,7 +50,7 @@ func New(
 // @Success      200 {array} dto.ProductTypeDTO
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /product-types [get]
+// @Router       /product-types [get].
 func (h *Handler) GetProductTypes(c *fiber.Ctx) error {
 	const op = "http.handlers.product_types.getProductTypes"
 
@@ -89,7 +89,7 @@ func (h *Handler) GetProductTypes(c *fiber.Ctx) error {
 // @Success      201 {object} models.ProductType
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /product-types [post]
+// @Router       /product-types [post].
 func (h *Handler) CreateProductType(c *fiber.Ctx) error {
 	const op = "http.handlers.product_types.createProductType"
 
@@ -125,7 +125,7 @@ func (h *Handler) CreateProductType(c *fiber.Ctx) error {
 // @Success      200 {object} response.Response
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /product-types/{id} [delete]
+// @Router       /product-types/{id} [delete].
 func (h *Handler) DeleteProductType(c *fiber.Ctx) error {
 	op := "http.handlers.product_types.deleteProductType"
 
@@ -163,7 +163,7 @@ func (h *Handler) DeleteProductType(c *fiber.Ctx) error {
 // @Success      200 {object} response.Response
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /product-types/{id} [put]
+// @Router       /product-types/{id} [put].
 func (h *Handler) UpdateProductType(c *fiber.Ctx) error {
 	op := "http.handlers.product_types.updateProductType"
 

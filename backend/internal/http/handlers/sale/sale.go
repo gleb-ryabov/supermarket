@@ -50,7 +50,7 @@ func New(
 // @Success      200 {array} dto.SaleDTO
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /sales [get]
+// @Router       /sales [get].
 func (h *Handler) GetSales(c *fiber.Ctx) error {
 	const op = "http.handlers.sales.getSales"
 
@@ -98,7 +98,7 @@ func (h *Handler) GetSales(c *fiber.Ctx) error {
 // @Success      201 {object} models.Sale
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /sales [post]
+// @Router       /sales [post].
 func (h *Handler) CreateSale(c *fiber.Ctx) error {
 	const op = "http.handlers.sales.createSale"
 
@@ -136,7 +136,7 @@ func (h *Handler) CreateSale(c *fiber.Ctx) error {
 // @Success      200 {object} response.Response
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /sales/{id} [put]
+// @Router       /sales/{id} [put].
 func (h *Handler) UpdateSale(c *fiber.Ctx) error {
 	const op = "http.handlers.sales.updateSale"
 
@@ -181,7 +181,7 @@ func (h *Handler) UpdateSale(c *fiber.Ctx) error {
 // @Success      200 {object} response.Response
 // @Failure      400 {object} response.Response
 // @Failure      500 {object} response.Response
-// @Router       /sales/{id} [delete]
+// @Router       /sales/{id} [delete].
 func (h *Handler) DeleteSale(c *fiber.Ctx) error {
 	const op = "http.handlers.sales.deleteSale"
 
