@@ -11,6 +11,8 @@ import (
 )
 
 // UnitOfWork is transactor for DB.
+//
+//go:generate mockery
 type UnitOfWork interface {
 	// Do execute transaction in DB.
 	Do(ctx context.Context, fn func(ctx context.Context, repos Repositories) error) error

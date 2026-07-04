@@ -1,0 +1,65 @@
+with-expecter: true
+
+dir: \Projects\Go\supermarket\backend\internal\mocks
+
+packages:
+  supermarket/internal/repository/transactions:
+    interfaces:
+      UnitOfWork: {}
+    config:
+      dir: \Projects\Go\supermarket\backend\internal\mocks\transactions
+      outpkg: transactionsnmock
+  supermarket/internal/repository/cancellation:
+    interfaces:
+      Repository: {}
+    config:
+      dir: \Projects\Go\supermarket\backend\internal\mocks\cancellation
+      outpkg: cancellationnmock
+  supermarket/internal/repository/price:
+    interfaces:
+      Repository: {}
+    config:
+      dir: \Projects\Go\supermarket\backend\internal\mocks\price
+      outpkg: pricemock
+  supermarket/internal/repository/product:
+    interfaces:
+      Repository: {}
+    config:
+      dir: \Projects\Go\supermarket\backend\internal\mocks\product
+      outpkg: productmock
+  supermarket/internal/repository/product_sale:
+    interfaces:
+      Repository: {}
+    config:
+      dir: \Projects\Go\supermarket\backend\internal\mocks\product_sale
+      outpkg: productsalemock
+  supermarket/internal/repository/product_supply:
+    interfaces:
+      Repository: {}
+    config:
+      dir: \Projects\Go\supermarket\backend\internal\mocks\product_supply
+      outpkg: productsupplymock
+  supermarket/internal/repository/product_type:
+    interfaces:
+      Repository: {}
+    config:
+      dir: \Projects\Go\supermarket\backend\internal\mocks\product_type
+      outpkg: producttypemock
+  supermarket/internal/repository/sale:
+    interfaces:
+      Repository: {}
+    config:
+      dir: \Projects\Go\supermarket\backend\internal\mocks\sale
+      outpkg: salemock
+  supermarket/internal/repository/stock:
+    interfaces:
+      Repository: {}
+    config:
+      dir: \Projects\Go\supermarket\backend\internal\mocks\stock
+      outpkg: stockmock
+  supermarket/internal/repository/supplier:
+    interfaces:
+      Repository: {}
+    config:
+      dir: \Projects\Go\supermarket\backend\internal\mocks\supplier
+      outpkg: suppliernmock

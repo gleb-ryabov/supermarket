@@ -8,6 +8,8 @@ import (
 )
 
 // Repository is the interface for product types.
+//
+//go:generate mockery
 type Repository interface {
 	repository.Repository[models.ProductType]
 	// GetByParams returns product types by params.

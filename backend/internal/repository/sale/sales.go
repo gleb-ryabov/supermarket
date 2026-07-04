@@ -9,6 +9,8 @@ import (
 )
 
 // Repository is the interface for sales.
+//
+//go:generate mockery
 type Repository interface {
 	repository.Repository[models.Sale]
 	// GetByParams returns sales by params.

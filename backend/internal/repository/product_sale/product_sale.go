@@ -10,6 +10,8 @@ import (
 )
 
 // Repository is the interface for product in the sale.
+//
+//go:generate mockery
 type Repository interface {
 	repository.Repository[models.ProductSale]
 	// GetBySale returns product from sale.

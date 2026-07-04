@@ -11,6 +11,8 @@ import (
 )
 
 // Repository is the interface for stocks.
+//
+//go:generate mockery
 type Repository interface {
 	repository.Repository[models.Stock]
 	// GetByParams returns stocks by search param.

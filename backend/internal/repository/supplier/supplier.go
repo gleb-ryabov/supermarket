@@ -8,6 +8,8 @@ import (
 )
 
 // Repository is the interface for suppliers.
+//
+//go:generate mockery
 type Repository interface {
 	repository.Repository[models.Supplier]
 	// GetByParams returns suppliers by search param.

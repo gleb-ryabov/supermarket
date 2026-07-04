@@ -11,6 +11,8 @@ import (
 )
 
 // Repository is the interface for products.
+//
+//go:generate mockery
 type Repository interface {
 	repository.Repository[models.Price]
 	// GetByParams returns prices by params.

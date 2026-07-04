@@ -11,6 +11,8 @@ import (
 )
 
 // Repository is the interface for cancellations.
+//
+//go:generate mockery
 type Repository interface {
 	repository.Repository[models.Cancellation]
 	// GetByParams returns cancellation by params.
