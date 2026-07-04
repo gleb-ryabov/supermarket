@@ -11,7 +11,6 @@ import (
 	"supermarket/internal/models"
 	"supermarket/internal/repository/sale"
 	"supermarket/internal/repository/transactions"
-	productsale "supermarket/internal/services/product_sale"
 )
 
 // service provides business logic for sales.
@@ -20,8 +19,6 @@ type service struct {
 
 	salesR sale.Repository
 	uow    transactions.UnitOfWork
-
-	productSalesS productsale.Service
 }
 
 // New creates service for sales.
@@ -29,13 +26,11 @@ func New(
 	logger *slog.Logger,
 	salesR sale.Repository,
 	uow transactions.UnitOfWork,
-	productSalesS productsale.Service,
 ) Service {
 	return &service{
-		logger:        logger,
-		salesR:        salesR,
-		uow:           uow,
-		productSalesS: productSalesS,
+		logger: logger,
+		salesR: salesR,
+		uow:    uow,
 	}
 }
 

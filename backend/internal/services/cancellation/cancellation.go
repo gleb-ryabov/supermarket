@@ -21,8 +21,6 @@ type service struct {
 
 	cancellationR cancellation.Repository
 	uow           transactions.UnitOfWork
-
-	stockS stock.Service
 }
 
 // New creates service for cancellations.
@@ -30,13 +28,11 @@ func New(
 	logger *slog.Logger,
 	cancellationR cancellation.Repository,
 	uow transactions.UnitOfWork,
-	stockS stock.Service,
 ) Service {
 	return &service{
 		logger:        logger,
 		cancellationR: cancellationR,
 		uow:           uow,
-		stockS:        stockS,
 	}
 }
 
