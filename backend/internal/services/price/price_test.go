@@ -17,11 +17,13 @@ import (
 	"supermarket/internal/models"
 )
 
+var errRepository error = errors.New("error in repository")
+
 // newTestService creates new price service for tests.
-func newTestService(priceRepo *pricemock.MockRepository) Service {
+func newTestService(priceR *pricemock.MockRepository) Service {
 	return New(
 		slogdiscard.NewDiscardLogger(),
-		priceRepo,
+		priceR,
 	)
 }
 
@@ -55,8 +57,8 @@ func TestGetPrices(t *testing.T) {
 				dateFrom: testhelper.Ptr(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)),
 				dateTo:   testhelper.Ptr(time.Date(2026, 12, 31, 0, 0, 0, 0, time.UTC)),
 			},
-			mockFn: func(repo *pricemock.MockRepository, args args) {
-				repo.EXPECT().
+			mockFn: func(priceR *pricemock.MockRepository, args args) {
+				priceR.EXPECT().
 					GetByParams(
 						args.ctx,
 						args.typeID,
@@ -77,15 +79,15 @@ func TestGetPrices(t *testing.T) {
 				dateFrom: testhelper.Ptr(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)),
 				dateTo:   testhelper.Ptr(time.Date(2026, 12, 31, 0, 0, 0, 0, time.UTC)),
 			},
-			mockFn: func(repo *pricemock.MockRepository, args args) {
-				repo.EXPECT().
+			mockFn: func(priceR *pricemock.MockRepository, args args) {
+				priceR.EXPECT().
 					GetByParams(
 						args.ctx,
 						args.typeID,
 						args.dateFrom,
 						args.dateTo,
 					).
-					Return(nil, errors.New("repository error")).
+					Return(nil, errRepository).
 					Once()
 			},
 			wantLen: 0,
@@ -97,10 +99,10 @@ func TestGetPrices(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			priceRepo := pricemock.NewMockRepository(t)
-			s := newTestService(priceRepo)
+			priceR := pricemock.NewMockRepository(t)
+			s := newTestService(priceR)
 
-			tc.mockFn(priceRepo, tc.args)
+			tc.mockFn(priceR, tc.args)
 
 			got, err := s.GetPrices(
 				tc.args.ctx,
@@ -140,7 +142,7 @@ func TestCreatePrice(t *testing.T) {
 	testCases := []struct {
 		name    string
 		args    args
-		mockFn  func(priceMock *pricemock.MockRepository, args args)
+		mockFn  func(priceR *pricemock.MockRepository, args args)
 		wantErr bool
 	}{
 		{
@@ -149,8 +151,8 @@ func TestCreatePrice(t *testing.T) {
 				ctx:   context.Background(),
 				price: &priceModel,
 			},
-			mockFn: func(priceMock *pricemock.MockRepository, args args) {
-				priceMock.EXPECT().
+			mockFn: func(priceR *pricemock.MockRepository, args args) {
+				priceR.EXPECT().
 					Create(args.ctx, &priceModel).
 					Return(nil).
 					Once()
@@ -163,10 +165,10 @@ func TestCreatePrice(t *testing.T) {
 				ctx:   context.Background(),
 				price: &priceModel,
 			},
-			mockFn: func(priceMock *pricemock.MockRepository, args args) {
-				priceMock.EXPECT().
+			mockFn: func(priceR *pricemock.MockRepository, args args) {
+				priceR.EXPECT().
 					Create(args.ctx, &priceModel).
-					Return(errors.New("repository error")).
+					Return(errRepository).
 					Once()
 			},
 			wantErr: true,
@@ -177,10 +179,10 @@ func TestCreatePrice(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			priceRepo := pricemock.NewMockRepository(t)
-			s := newTestService(priceRepo)
+			priceR := pricemock.NewMockRepository(t)
+			s := newTestService(priceR)
 
-			tc.mockFn(priceRepo, tc.args)
+			tc.mockFn(priceR, tc.args)
 
 			err := s.CreatePrice(tc.args.ctx, tc.args.price)
 
@@ -207,7 +209,7 @@ func TestDeletePrice(t *testing.T) {
 	testCases := []struct {
 		name    string
 		args    args
-		mockFn  func(priceMock *pricemock.MockRepository, args args)
+		mockFn  func(priceR *pricemock.MockRepository, args args)
 		wantErr bool
 	}{
 		{
@@ -216,8 +218,8 @@ func TestDeletePrice(t *testing.T) {
 				ctx: context.Background(),
 				id:  uuid.New(),
 			},
-			mockFn: func(priceMock *pricemock.MockRepository, args args) {
-				priceMock.EXPECT().
+			mockFn: func(priceR *pricemock.MockRepository, args args) {
+				priceR.EXPECT().
 					Delete(args.ctx, args.id).
 					Return(nil).
 					Once()
@@ -230,10 +232,10 @@ func TestDeletePrice(t *testing.T) {
 				ctx: context.Background(),
 				id:  uuid.New(),
 			},
-			mockFn: func(priceMock *pricemock.MockRepository, args args) {
-				priceMock.EXPECT().
+			mockFn: func(priceR *pricemock.MockRepository, args args) {
+				priceR.EXPECT().
 					Delete(args.ctx, args.id).
-					Return(errors.New("repository error")).
+					Return(errRepository).
 					Once()
 			},
 			wantErr: true,
@@ -244,10 +246,10 @@ func TestDeletePrice(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			priceRepo := pricemock.NewMockRepository(t)
-			s := newTestService(priceRepo)
+			priceR := pricemock.NewMockRepository(t)
+			s := newTestService(priceR)
 
-			tc.mockFn(priceRepo, tc.args)
+			tc.mockFn(priceR, tc.args)
 
 			err := s.DeletePrice(tc.args.ctx, tc.args.id)
 
@@ -275,7 +277,7 @@ func TestUpdatePrice(t *testing.T) {
 	testCases := []struct {
 		name    string
 		args    args
-		mockFn  func(priceMock *pricemock.MockRepository, args args)
+		mockFn  func(priceR *pricemock.MockRepository, args args)
 		wantErr bool
 	}{
 		{
@@ -284,8 +286,8 @@ func TestUpdatePrice(t *testing.T) {
 				ctx:   context.Background(),
 				price: &priceModel,
 			},
-			mockFn: func(priceMock *pricemock.MockRepository, args args) {
-				priceMock.EXPECT().
+			mockFn: func(priceR *pricemock.MockRepository, args args) {
+				priceR.EXPECT().
 					Update(args.ctx, args.price).
 					Return(nil).
 					Once()
@@ -298,10 +300,10 @@ func TestUpdatePrice(t *testing.T) {
 				ctx:   context.Background(),
 				price: &priceModel,
 			},
-			mockFn: func(priceMock *pricemock.MockRepository, args args) {
-				priceMock.EXPECT().
+			mockFn: func(priceR *pricemock.MockRepository, args args) {
+				priceR.EXPECT().
 					Update(args.ctx, args.price).
-					Return(errors.New("repository error")).
+					Return(errRepository).
 					Once()
 			},
 			wantErr: true,
@@ -312,10 +314,10 @@ func TestUpdatePrice(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			priceRepo := pricemock.NewMockRepository(t)
-			s := newTestService(priceRepo)
+			priceR := pricemock.NewMockRepository(t)
+			s := newTestService(priceR)
 
-			tc.mockFn(priceRepo, tc.args)
+			tc.mockFn(priceR, tc.args)
 
 			err := s.UpdatePrice(tc.args.ctx, tc.args.price)
 
