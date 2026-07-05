@@ -17,7 +17,7 @@ import (
 	"supermarket/internal/models"
 )
 
-var errRepository error = errors.New("error in repository")
+var errRepository = errors.New("error in repository")
 
 // newTestService creates new price service for tests.
 func newTestService(priceR *pricemock.MockRepository) Service {
@@ -188,6 +188,7 @@ func TestCreatePrice(t *testing.T) {
 
 			if tc.wantErr {
 				require.Error(t, err)
+
 				return
 			}
 
@@ -255,6 +256,7 @@ func TestDeletePrice(t *testing.T) {
 
 			if tc.wantErr {
 				require.Error(t, err)
+
 				return
 			}
 
@@ -323,6 +325,7 @@ func TestUpdatePrice(t *testing.T) {
 
 			if tc.wantErr {
 				require.Error(t, err)
+
 				return
 			}
 

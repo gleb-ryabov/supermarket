@@ -3,19 +3,20 @@ package product
 import (
 	"context"
 	"errors"
-	"supermarket/internal/http/dto"
-	slogdiscard "supermarket/internal/lib/logger"
-	testhelper "supermarket/internal/lib/test"
-	productmock "supermarket/internal/mocks/product"
-	"supermarket/internal/models"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
+
+	"supermarket/internal/http/dto"
+	slogdiscard "supermarket/internal/lib/logger"
+	testhelper "supermarket/internal/lib/test"
+	productmock "supermarket/internal/mocks/product"
+	"supermarket/internal/models"
 )
 
-var errRepository error = errors.New("error in repository")
+var errRepository = errors.New("error in repository")
 
 // newTestService creates new product service for tests.
 func newTestService(productR *productmock.MockRepository) Service {
@@ -196,7 +197,7 @@ func TestCreateProduct(t *testing.T) {
 
 // TestDeleteProduct tests method DeleteProduct().
 //
-//nolint:funlen
+
 func TestDeleteProduct(t *testing.T) {
 	type args struct {
 		ctx context.Context
@@ -326,7 +327,6 @@ func TestUpdateProduct(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
-
 }
 
 func requireProductDTO(t *testing.T, want models.Product, got dto.ProductDTO) {
