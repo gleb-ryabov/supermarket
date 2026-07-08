@@ -3,6 +3,13 @@ package productsale
 import (
 	"context"
 	"errors"
+	"testing"
+
+	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+
 	"supermarket/internal/http/dto"
 	slogdiscard "supermarket/internal/lib/logger"
 	productsalemock "supermarket/internal/mocks/product_sale"
@@ -12,12 +19,6 @@ import (
 	productsale "supermarket/internal/repository/product_sale"
 	"supermarket/internal/repository/stock"
 	"supermarket/internal/repository/transactions"
-	"testing"
-
-	"github.com/google/uuid"
-	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 )
 
 var errRepository = errors.New("error in repository")
