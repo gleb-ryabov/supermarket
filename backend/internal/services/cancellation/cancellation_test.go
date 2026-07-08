@@ -198,6 +198,7 @@ func TestCreateCancellation(t *testing.T) {
 			) {
 				setupDoUOW(args.ctx, uow, cancellationR, stockR, nil)
 				setupCreate(args.ctx, cancellationR, args.cancellation, nil)
+				setupFirstOrCreateByProductID(args.ctx, stockR, args.cancellation.ProductID, nil)
 				setupSetCountByProductID(args.ctx, stockR, args.cancellation, nil)
 			},
 			wantErr: false,
@@ -220,6 +221,24 @@ func TestCreateCancellation(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "error get stock for set stock",
+			args: args{
+				ctx:          ctx,
+				cancellation: &cancellationModel,
+			},
+			mockFn: func(
+				uow *transactionsnmock.MockUnitOfWork,
+				cancellationR *cancellationnmock.MockRepository,
+				stockR *stockmock.MockRepository,
+				args args,
+			) {
+				setupDoUOW(args.ctx, uow, cancellationR, stockR, nil)
+				setupCreate(args.ctx, cancellationR, args.cancellation, nil)
+				setupFirstOrCreateByProductID(args.ctx, stockR, args.cancellation.ProductID, errRepository)
+			},
+			wantErr: true,
+		},
+		{
 			name: "error set stock",
 			args: args{
 				ctx:          ctx,
@@ -233,6 +252,7 @@ func TestCreateCancellation(t *testing.T) {
 			) {
 				setupDoUOW(args.ctx, uow, cancellationR, stockR, nil)
 				setupCreate(args.ctx, cancellationR, args.cancellation, nil)
+				setupFirstOrCreateByProductID(args.ctx, stockR, args.cancellation.ProductID, nil)
 				setupSetCountByProductID(args.ctx, stockR, args.cancellation, errRepository)
 			},
 			wantErr: true,
@@ -633,6 +653,19 @@ func setupUpdateStockByCancellation(
 	stockR.EXPECT().
 		UpdateStockByCancellation(ctx, cancellationID, quantity).
 		Return(err).
+		Once()
+}
+
+// setupFirstOrCreateByProductID sets the expected behavior method FirstOrCreateByProductID() of a stock repository.
+func setupFirstOrCreateByProductID(
+	ctx context.Context,
+	stockR *stockmock.MockRepository,
+	productID uuid.UUID,
+	err error,
+) {
+	stockR.EXPECT().
+		FirstOrCreateByProductID(ctx, productID).
+		Return(&models.Stock{}, err).
 		Once()
 }
 
