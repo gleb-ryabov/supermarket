@@ -12,7 +12,6 @@ import (
 	"supermarket/internal/models"
 	"supermarket/internal/repository/cancellation"
 	"supermarket/internal/repository/transactions"
-	"supermarket/internal/services/stock"
 )
 
 // service provides business logic for cancellations.
@@ -85,10 +84,8 @@ func (s *service) CreateCancellation(ctx context.Context, cancellation *models.C
 			return err
 		}
 
-		if err := stock.IncreaseStock(
+		if err := repos.Stock.SetCountByProductID(
 			ctx,
-			s.logger,
-			repos.Stock,
 			cancellation.ProductID,
 			cancellation.Quantity.Neg(),
 		); err != nil {
