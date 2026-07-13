@@ -42,7 +42,11 @@ func (r *Repository[T]) Create(ctx context.Context, t *T) error {
 
 // Update replaces item in the db.
 func (r *Repository[T]) Update(ctx context.Context, t *T) error {
-	return r.db.WithContext(ctx).Model(t).Updates(t).Error
+	return r.db.WithContext(ctx).
+		Model(t).
+		Select("*").
+		Updates(t).
+		Error
 }
 
 // Delete drops item in the db.
