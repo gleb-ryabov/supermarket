@@ -5,6 +5,8 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+
+	"supermarket/internal/repository"
 )
 
 // Repository is base gorm repository with owner generic methods.
@@ -42,16 +44,35 @@ func (r *Repository[T]) Create(ctx context.Context, t *T) error {
 
 // Update replaces item in the db.
 func (r *Repository[T]) Update(ctx context.Context, t *T) error {
-	return r.db.WithContext(ctx).
+	res := r.db.WithContext(ctx).
 		Model(t).
 		Select("*").
-		Updates(t).
-		Error
+		Updates(t)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		return repository.ErrNotFound
+	}
+
+	return nil
 }
 
 // Delete drops item in the db.
 func (r *Repository[T]) Delete(ctx context.Context, id uuid.UUID) error {
 	var item T
 
-	return r.db.WithContext(ctx).Delete(&item, id).Error
+	res := r.db.WithContext(ctx).Delete(&item, id)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		return repository.ErrNotFound
+	}
+
+	return nil
 }

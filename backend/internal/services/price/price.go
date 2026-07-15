@@ -2,6 +2,7 @@ package price
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -9,7 +10,9 @@ import (
 
 	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
+	"supermarket/internal/repository"
 	"supermarket/internal/repository/price"
+	"supermarket/internal/services"
 )
 
 // service provides business logic for prices.
@@ -85,15 +88,22 @@ func (s *service) CreatePrice(ctx context.Context, price *models.Price) error {
 func (s *service) DeletePrice(ctx context.Context, id uuid.UUID) error {
 	const op = "services.price.deletePrice"
 
-	log := s.logger.With("op", op)
+	log := s.logger.With("op", op).
+		With("id", id)
 
 	if err := s.priceR.Delete(ctx, id); err != nil {
-		log.Error("failed to delete price",
-			slog.Any("error", err),
-			slog.Any("id", id),
-		)
+		switch {
+		case errors.Is(err, repository.ErrNotFound):
+			log.Error("price not found")
 
-		return err
+			return services.ErrNotFound
+		default:
+			log.Error("failed to delete price",
+				slog.Any("error", err),
+			)
+
+			return err
+		}
 	}
 
 	return nil
@@ -103,15 +113,22 @@ func (s *service) DeletePrice(ctx context.Context, id uuid.UUID) error {
 func (s *service) UpdatePrice(ctx context.Context, price *models.Price) error {
 	const op = "services.price.updatePrice"
 
-	log := s.logger.With("op", op)
+	log := s.logger.With("op", op).
+		With("price", *price)
 
 	if err := s.priceR.Update(ctx, price); err != nil {
-		log.Error("failed to update product",
-			slog.Any("error", err),
-			slog.Any("price", *price),
-		)
+		switch {
+		case errors.Is(err, repository.ErrNotFound):
+			log.Error("price not found")
 
-		return err
+			return services.ErrNotFound
+		default:
+			log.Error("failed to update price",
+				slog.Any("error", err),
+			)
+
+			return err
+		}
 	}
 
 	return nil

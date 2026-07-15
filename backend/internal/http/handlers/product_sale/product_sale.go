@@ -2,6 +2,7 @@ package productsale
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"supermarket/internal/lib/api/request"
 	resp "supermarket/internal/lib/api/response"
 	"supermarket/internal/models"
+	"supermarket/internal/services"
 	productsale "supermarket/internal/services/product_sale"
 )
 
@@ -141,7 +143,12 @@ func (h *Handler) DeleteProductInSale(c *fiber.Ctx) error {
 	}
 
 	if err = h.productSaleS.DeleteProductInSale(ctx, id); err != nil {
-		return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed delete product in sale"))
+		switch {
+		case errors.Is(err, services.ErrNotFound):
+			return resp.Respond(c, fiber.StatusNotFound, resp.Error("product in sale not found"))
+		default:
+			return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed delete product in sale"))
+		}
 	}
 
 	log.Debug("deleted product in sale", slog.Any("id", id))
@@ -188,7 +195,12 @@ func (h *Handler) UpdateProductInSale(c *fiber.Ctx) error {
 	p.ID = id
 
 	if err = h.productSaleS.UpdateProductInSale(ctx, &p); err != nil {
-		return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed update product"))
+		switch {
+		case errors.Is(err, services.ErrNotFound):
+			return resp.Respond(c, fiber.StatusNotFound, resp.Error("product in sale not found"))
+		default:
+			return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed update product"))
+		}
 	}
 
 	log.Debug("updated product in sale", slog.Any("id", id), slog.Any("productSale", p))

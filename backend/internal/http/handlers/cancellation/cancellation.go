@@ -2,6 +2,7 @@ package cancellation
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"supermarket/internal/lib/api/request"
 	resp "supermarket/internal/lib/api/response"
 	"supermarket/internal/models"
+	"supermarket/internal/services"
 	"supermarket/internal/services/cancellation"
 )
 
@@ -165,7 +167,12 @@ func (h *Handler) DeleteCancellation(c *fiber.Ctx) error {
 	}
 
 	if err = h.cancellationsS.DeleteCancellation(ctx, id); err != nil {
-		return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed delete cancellation"))
+		switch {
+		case errors.Is(err, services.ErrNotFound):
+			return resp.Respond(c, fiber.StatusNotFound, resp.Error("cancellation not found"))
+		default:
+			return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed delete cancellation"))
+		}
 	}
 
 	log.Debug("deleted cancellation", slog.Any("id", id))
@@ -212,7 +219,12 @@ func (h *Handler) UpdateCancellation(c *fiber.Ctx) error {
 	cancellation.ID = id
 
 	if err = h.cancellationsS.UpdateCancellation(ctx, &cancellation); err != nil {
-		return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed update cancellation"))
+		switch {
+		case errors.Is(err, services.ErrNotFound):
+			return resp.Respond(c, fiber.StatusNotFound, resp.Error("cancellation not found"))
+		default:
+			return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed update cancellation"))
+		}
 	}
 
 	log.Debug(

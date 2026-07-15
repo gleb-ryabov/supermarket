@@ -2,13 +2,16 @@ package producttype
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"github.com/google/uuid"
 
 	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
+	"supermarket/internal/repository"
 	producttype "supermarket/internal/repository/product_type"
+	"supermarket/internal/services"
 )
 
 // service provides business logic for product types.
@@ -78,15 +81,23 @@ func (s *service) CreateProductType(ctx context.Context, pt *models.ProductType)
 func (s *service) DeleteProductType(ctx context.Context, id uuid.UUID) error {
 	const op = "services.product_types.deleteProductType"
 
-	log := s.logger.With("op", op)
+	log := s.logger.With("op", op).
+		With("id", id)
 
 	if err := s.productTypesR.Delete(ctx, id); err != nil {
-		log.Error("failed to delete product types",
-			slog.Any("error", err),
-			slog.Any("id", id),
-		)
+		switch {
+		case errors.Is(err, repository.ErrNotFound):
+			log.Error("product type not found")
 
-		return err
+			return services.ErrNotFound
+
+		default:
+			log.Error("failed to delete product type",
+				slog.Any("error", err),
+			)
+
+			return err
+		}
 	}
 
 	return nil
@@ -96,15 +107,23 @@ func (s *service) DeleteProductType(ctx context.Context, id uuid.UUID) error {
 func (s *service) UpdateProductType(ctx context.Context, pt *models.ProductType) error {
 	const op = "services.product_types.updateProductType"
 
-	log := s.logger.With("op", op)
+	log := s.logger.With("op", op).
+		With("productType", *pt)
 
 	if err := s.productTypesR.Update(ctx, pt); err != nil {
-		log.Error("failed to update product type",
-			slog.Any("error", err),
-			slog.Any("productType", *pt),
-		)
+		switch {
+		case errors.Is(err, repository.ErrNotFound):
+			log.Error("product type not found")
 
-		return err
+			return services.ErrNotFound
+
+		default:
+			log.Error("failed to update product type",
+				slog.Any("error", err),
+			)
+
+			return err
+		}
 	}
 
 	return nil

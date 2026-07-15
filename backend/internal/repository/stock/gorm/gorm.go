@@ -114,16 +114,20 @@ func (r *repository) UpdateStockByProductSale(
 
 // UpdateStockOnDeleteSale changes the quantity of a stock item on drop sale.
 func (r *repository) UpdateStockOnDeleteSale(ctx context.Context, saleID uuid.UUID) error {
-	err := r.db.WithContext(ctx).Exec(`
-			UPDATE stock s 
-			SET quantity = s.quantity + ps.quantity
-			FROM product_sales ps
-			WHERE ps.sale_id = ?
-				AND ps.product_id = s.product_id 
-		`, saleID,
-	).Error
-	if err != nil {
-		return err
+	res := r.db.WithContext(ctx).Exec(`
+		UPDATE stock s 
+		SET quantity = s.quantity + ps.quantity
+		FROM product_sales ps
+		WHERE ps.sale_id = ?
+			AND ps.product_id = s.product_id 
+	`, saleID)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		return repo.ErrNotFound
 	}
 
 	return nil
@@ -135,16 +139,20 @@ func (r *repository) UpdateStockByProductSupply(
 	productSupplyID uuid.UUID,
 	newQuantity decimal.Decimal,
 ) error {
-	err := r.db.WithContext(ctx).Exec(`
-			UPDATE stock s 
-			SET quantity = s.quantity - (ps.quantity - ?)
-			FROM product_supplies ps
-			WHERE ps.supply_id = ?
-				AND ps.product_id = s.product_id 
-		`, newQuantity, productSupplyID,
-	).Error
-	if err != nil {
-		return err
+	res := r.db.WithContext(ctx).Exec(`
+		UPDATE stock s 
+		SET quantity = s.quantity - (ps.quantity - ?)
+		FROM product_supplies ps
+		WHERE ps.supply_id = ?
+			AND ps.product_id = s.product_id 
+	`, newQuantity, productSupplyID)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		return repo.ErrNotFound
 	}
 
 	return nil
@@ -156,16 +164,20 @@ func (r *repository) UpdateStockByCancellation(
 	cancellationID uuid.UUID,
 	newQuantity decimal.Decimal,
 ) error {
-	err := r.db.WithContext(ctx).Exec(`
-			UPDATE stock s 
-			SET quantity = s.quantity + (c.quantity - ?)
-			FROM cancellation c
-			WHERE c.cancellation_id = ?
-				AND c.product_id = s.product_id 
-		`, newQuantity, cancellationID,
-	).Error
-	if err != nil {
-		return err
+	res := r.db.WithContext(ctx).Exec(`
+		UPDATE stock s 
+		SET quantity = s.quantity + (c.quantity - ?)
+		FROM cancellation c
+		WHERE c.cancellation_id = ?
+			AND c.product_id = s.product_id 
+	`, newQuantity, cancellationID)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		return repo.ErrNotFound
 	}
 
 	return nil

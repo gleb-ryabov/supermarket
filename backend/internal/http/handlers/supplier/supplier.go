@@ -2,6 +2,7 @@ package supplier
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 
 	resp "supermarket/internal/lib/api/response"
 	"supermarket/internal/models"
+	"supermarket/internal/services"
 	"supermarket/internal/services/supplier"
 )
 
@@ -134,7 +136,12 @@ func (h *Handler) DeleteSupplier(c *fiber.Ctx) error {
 	}
 
 	if err = h.suppliersS.DeleteSupplier(ctx, id); err != nil {
-		return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed delete supplier"))
+		switch {
+		case errors.Is(err, services.ErrNotFound):
+			return resp.Respond(c, fiber.StatusNotFound, resp.Error("supplier not found"))
+		default:
+			return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed delete supplier"))
+		}
 	}
 
 	log.Debug("deleted supplier", slog.Any("id", id))
@@ -181,7 +188,12 @@ func (h *Handler) UpdateSupplier(c *fiber.Ctx) error {
 	s.ID = id
 
 	if err = h.suppliersS.UpdateSupplier(ctx, &s); err != nil {
-		return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed update supplier"))
+		switch {
+		case errors.Is(err, services.ErrNotFound):
+			return resp.Respond(c, fiber.StatusNotFound, resp.Error("supplier not found"))
+		default:
+			return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed update supplier"))
+		}
 	}
 
 	log.Debug("updated supplier", slog.Any("id", id), slog.Any("supplier", s))

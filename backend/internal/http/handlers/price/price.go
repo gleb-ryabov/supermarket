@@ -2,6 +2,7 @@ package price
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"supermarket/internal/lib/api/request"
 	resp "supermarket/internal/lib/api/response"
 	"supermarket/internal/models"
+	"supermarket/internal/services"
 	"supermarket/internal/services/price"
 )
 
@@ -163,7 +165,12 @@ func (h *Handler) DeletePrice(c *fiber.Ctx) error {
 	}
 
 	if err = h.pricesS.DeletePrice(ctx, id); err != nil {
-		return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed delete price"))
+		switch {
+		case errors.Is(err, services.ErrNotFound):
+			return resp.Respond(c, fiber.StatusNotFound, resp.Error("price not found"))
+		default:
+			return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed delete price"))
+		}
 	}
 
 	log.Debug("deleted price", slog.Any("id", id))
@@ -210,7 +217,12 @@ func (h *Handler) UpdatePrice(c *fiber.Ctx) error {
 	p.ID = id
 
 	if err = h.pricesS.UpdatePrice(ctx, &p); err != nil {
-		return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed update price"))
+		switch {
+		case errors.Is(err, services.ErrNotFound):
+			return resp.Respond(c, fiber.StatusNotFound, resp.Error("price not found"))
+		default:
+			return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed update price"))
+		}
 	}
 
 	log.Debug("updated price", slog.Any("id", id), slog.Any("price", p))

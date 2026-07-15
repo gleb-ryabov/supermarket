@@ -73,7 +73,7 @@ func (s *service) IncreaseStock(
 	)
 }
 
-// IncreaseStock updates the quantity of a stock item by its product id. Sets += for count.
+// IncreaseStock increases stock quantity by count.
 // If not found creates a new item.
 func IncreaseStock(
 	ctx context.Context,
@@ -82,7 +82,7 @@ func IncreaseStock(
 	productID uuid.UUID,
 	count decimal.Decimal,
 ) error {
-	const op = "services.stocks.setCountStock"
+	const op = "services.stocks.increaseStock"
 
 	log := logger.
 		With("op", op).

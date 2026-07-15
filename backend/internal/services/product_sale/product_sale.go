@@ -2,6 +2,7 @@ package productsale
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"github.com/google/uuid"
@@ -9,8 +10,10 @@ import (
 
 	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
+	"supermarket/internal/repository"
 	productsale "supermarket/internal/repository/product_sale"
 	"supermarket/internal/repository/transactions"
+	"supermarket/internal/services"
 	"supermarket/internal/services/stock"
 )
 
@@ -97,25 +100,40 @@ func (s *service) CreateProductInSale(ctx context.Context, productSale *models.P
 func (s *service) UpdateProductInSale(ctx context.Context, productSale *models.ProductSale) error {
 	const op = "services.product_sale.updateProductInSale"
 
-	log := s.logger.With("op", op)
+	log := s.logger.With("op", op).
+		With("productSale", *productSale)
 
 	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
 		if err := repos.Stock.UpdateStockByProductSale(ctx, productSale.ID, productSale.Quantity); err != nil {
-			log.Error("failed to set count stock", slog.Any("error", err),
-				slog.Any("error", err),
-				slog.Any("productSale", *productSale),
-			)
+			switch {
+			case errors.Is(err, repository.ErrNotFound):
+				log.Error("stock not found")
 
-			return err
+				return services.ErrNotFound
+
+			default:
+				log.Error("failed to update stock",
+					slog.Any("error", err),
+				)
+
+				return err
+			}
 		}
 
 		if err := repos.ProductSale.Update(ctx, productSale); err != nil {
-			log.Error("failed to update product in sale",
-				slog.Any("error", err),
-				slog.Any("productSale", *productSale),
-			)
+			switch {
+			case errors.Is(err, repository.ErrNotFound):
+				log.Error("product sale not found")
 
-			return err
+				return services.ErrNotFound
+
+			default:
+				log.Error("failed to update product in sale",
+					slog.Any("error", err),
+				)
+
+				return err
+			}
 		}
 
 		return nil
@@ -126,19 +144,40 @@ func (s *service) UpdateProductInSale(ctx context.Context, productSale *models.P
 func (s *service) DeleteProductInSale(ctx context.Context, id uuid.UUID) error {
 	const op = "services.product_sale.deleteProductInSale"
 
-	log := s.logger.With("op", op).With("id", id)
+	log := s.logger.With("op", op).
+		With("id", id)
 
 	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
 		if err := repos.Stock.UpdateStockByProductSale(ctx, id, decimal.Zero); err != nil {
-			log.Error("failed to set count stock", slog.Any("error", err))
+			switch {
+			case errors.Is(err, repository.ErrNotFound):
+				log.Error("stock not found")
 
-			return err
+				return services.ErrNotFound
+
+			default:
+				log.Error("failed to update stock",
+					slog.Any("error", err),
+				)
+
+				return err
+			}
 		}
 
 		if err := repos.ProductSale.Delete(ctx, id); err != nil {
-			log.Error("failed to delete product in sale", slog.Any("error", err))
+			switch {
+			case errors.Is(err, repository.ErrNotFound):
+				log.Error("product sale not found")
 
-			return err
+				return services.ErrNotFound
+
+			default:
+				log.Error("failed to delete product in sale",
+					slog.Any("error", err),
+				)
+
+				return err
+			}
 		}
 
 		return nil
@@ -149,19 +188,40 @@ func (s *service) DeleteProductInSale(ctx context.Context, id uuid.UUID) error {
 func (s *service) DeleteProductsBySaleID(ctx context.Context, saleID uuid.UUID) error {
 	const op = "services.product_sale.deleteProductsBySaleID"
 
-	log := s.logger.With("op", op)
+	log := s.logger.With("op", op).
+		With("saleID", saleID)
 
 	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
 		if err := repos.Stock.UpdateStockOnDeleteSale(ctx, saleID); err != nil {
-			log.Error("failed to set count stock", slog.Any("error", err))
+			switch {
+			case errors.Is(err, repository.ErrNotFound):
+				log.Error("stock not found")
 
-			return err
+				return services.ErrNotFound
+
+			default:
+				log.Error("failed to update stock",
+					slog.Any("error", err),
+				)
+
+				return err
+			}
 		}
 
 		if err := repos.ProductSale.DeleteBySale(ctx, saleID); err != nil {
-			log.Error("failed to delete products by sale ID", slog.Any("error", err), slog.Any("saleID", saleID))
+			switch {
+			case errors.Is(err, repository.ErrNotFound):
+				log.Error("products in sale not found")
 
-			return err
+				return services.ErrNotFound
+
+			default:
+				log.Error("failed to delete products by sale ID",
+					slog.Any("error", err),
+				)
+
+				return err
+			}
 		}
 
 		return nil

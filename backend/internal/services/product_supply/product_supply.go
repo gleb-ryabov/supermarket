@@ -2,6 +2,7 @@ package productsupply
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -10,8 +11,10 @@ import (
 
 	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
+	"supermarket/internal/repository"
 	productsupply "supermarket/internal/repository/product_supply"
 	"supermarket/internal/repository/transactions"
+	"supermarket/internal/services"
 	"supermarket/internal/services/stock"
 )
 
@@ -115,15 +118,35 @@ func (s *service) DeleteProductSupply(ctx context.Context, id uuid.UUID) error {
 
 	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
 		if err := repos.Stock.UpdateStockByProductSupply(ctx, id, decimal.Zero); err != nil {
-			log.Error("failed to set count stock", slog.Any("error", err))
+			switch {
+			case errors.Is(err, repository.ErrNotFound):
+				log.Error("stock not found")
 
-			return err
+				return services.ErrNotFound
+
+			default:
+				log.Error("failed to update stock",
+					slog.Any("error", err),
+				)
+
+				return err
+			}
 		}
 
 		if err := repos.ProductSupply.Delete(ctx, id); err != nil {
-			log.Error("failed to delete product supplies", slog.Any("error", err))
+			switch {
+			case errors.Is(err, repository.ErrNotFound):
+				log.Error("product supply not found")
 
-			return err
+				return services.ErrNotFound
+
+			default:
+				log.Error("failed to delete product supply",
+					slog.Any("error", err),
+				)
+
+				return err
+			}
 		}
 
 		return nil
@@ -134,25 +157,40 @@ func (s *service) DeleteProductSupply(ctx context.Context, id uuid.UUID) error {
 func (s *service) UpdateProductSupply(ctx context.Context, ps *models.ProductSupply) error {
 	const op = "services.product_supply.updateProductSupply"
 
-	log := s.logger.With("op", op)
+	log := s.logger.With("op", op).
+		With("productSupply", *ps)
 
 	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
 		if err := repos.Stock.UpdateStockByProductSupply(ctx, ps.ID, ps.Quantity); err != nil {
-			log.Error("failed to set count stock",
-				slog.Any("error", err),
-				slog.Any("productSupply", *ps),
-			)
+			switch {
+			case errors.Is(err, repository.ErrNotFound):
+				log.Error("stock not found")
 
-			return err
+				return services.ErrNotFound
+
+			default:
+				log.Error("failed to update stock",
+					slog.Any("error", err),
+				)
+
+				return err
+			}
 		}
 
 		if err := repos.ProductSupply.Update(ctx, ps); err != nil {
-			log.Error("failed to update product supply",
-				slog.Any("error", err),
-				slog.Any("productSupply", *ps),
-			)
+			switch {
+			case errors.Is(err, repository.ErrNotFound):
+				log.Error("product supply not found")
 
-			return err
+				return services.ErrNotFound
+
+			default:
+				log.Error("failed to update product supply",
+					slog.Any("error", err),
+				)
+
+				return err
+			}
 		}
 
 		return nil

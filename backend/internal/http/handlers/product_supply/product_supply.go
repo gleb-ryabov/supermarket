@@ -174,11 +174,14 @@ func (h *Handler) DeleteProductSupply(c *fiber.Ctx) error {
 	}
 
 	if err = h.productSuppliesS.DeleteProductSupply(ctx, id); err != nil {
-		if errors.Is(err, services.ErrNotEnoughStock) {
+		switch {
+		case errors.Is(err, services.ErrNotEnoughStock):
 			return resp.Respond(c, fiber.StatusConflict, resp.Error("not enough stock"))
+		case errors.Is(err, services.ErrNotFound):
+			return resp.Respond(c, fiber.StatusNotFound, resp.Error("product supply not found"))
+		default:
+			return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed delete product supply"))
 		}
-
-		return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed delete product supply"))
 	}
 
 	log.Debug("deleted product supply", slog.Any("id", id))
@@ -226,11 +229,14 @@ func (h *Handler) UpdateProductSupply(c *fiber.Ctx) error {
 	ps.ID = id
 
 	if err = h.productSuppliesS.UpdateProductSupply(ctx, &ps); err != nil {
-		if errors.Is(err, services.ErrNotEnoughStock) {
+		switch {
+		case errors.Is(err, services.ErrNotEnoughStock):
 			return resp.Respond(c, fiber.StatusConflict, resp.Error("not enough stock"))
+		case errors.Is(err, services.ErrNotFound):
+			return resp.Respond(c, fiber.StatusNotFound, resp.Error("product supply not found"))
+		default:
+			return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed update product supply"))
 		}
-
-		return resp.Respond(c, fiber.StatusInternalServerError, resp.Error("failed update product supply"))
 	}
 
 	log.Debug("updated product supply", slog.Any("id", id), slog.Any("productSupply", ps))

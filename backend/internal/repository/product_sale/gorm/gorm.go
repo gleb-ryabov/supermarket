@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"supermarket/internal/models"
+	repo "supermarket/internal/repository"
 	base "supermarket/internal/repository/gorm"
 	productsale "supermarket/internal/repository/product_sale"
 )
@@ -44,10 +45,16 @@ func (r *repository) GetBySale(ctx context.Context, saleID uuid.UUID) ([]models.
 func (r *repository) DeleteBySale(ctx context.Context, saleID uuid.UUID) error {
 	var ps models.ProductSale
 
-	if err := r.db.WithContext(ctx).
+	res := r.db.WithContext(ctx).
 		Where("sale_id = ?", saleID).
-		Delete(&ps).Error; err != nil {
-		return err
+		Delete(&ps)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		return repo.ErrNotFound
 	}
 
 	return nil

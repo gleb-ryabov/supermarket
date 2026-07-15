@@ -2,13 +2,16 @@ package supplier
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"github.com/google/uuid"
 
 	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
+	"supermarket/internal/repository"
 	"supermarket/internal/repository/supplier"
+	"supermarket/internal/services"
 )
 
 // service provides business logic for suppliers.
@@ -73,19 +76,26 @@ func (s *service) CreateSupplier(ctx context.Context, supplier *models.Supplier)
 	return nil
 }
 
-// DeleteSupplier deletes supplier in the db by id.
 func (s *service) DeleteSupplier(ctx context.Context, id uuid.UUID) error {
 	const op = "services.supplier.deleteSupplier"
 
-	log := s.logger.With("op", op)
+	log := s.logger.With("op", op).
+		With("supplierID", id)
 
 	if err := s.supplierR.Delete(ctx, id); err != nil {
-		log.Error("failed to delete supplier",
-			slog.Any("error", err),
-			slog.Any("id", id),
-		)
+		switch {
+		case errors.Is(err, repository.ErrNotFound):
+			log.Error("supplier not found")
 
-		return err
+			return services.ErrNotFound
+
+		default:
+			log.Error("failed to delete supplier",
+				slog.Any("error", err),
+			)
+
+			return err
+		}
 	}
 
 	return nil
@@ -95,15 +105,23 @@ func (s *service) DeleteSupplier(ctx context.Context, id uuid.UUID) error {
 func (s *service) UpdateSupplier(ctx context.Context, sp *models.Supplier) error {
 	const op = "services.supplier.updateSupplier"
 
-	log := s.logger.With("op", op)
+	log := s.logger.With("op", op).
+		With("supplier", *sp)
 
 	if err := s.supplierR.Update(ctx, sp); err != nil {
-		log.Error("failed to update supplier",
-			slog.Any("error", err),
-			slog.Any("supplier", *sp),
-		)
+		switch {
+		case errors.Is(err, repository.ErrNotFound):
+			log.Error("supplier not found")
 
-		return err
+			return services.ErrNotFound
+
+		default:
+			log.Error("failed to update supplier",
+				slog.Any("error", err),
+			)
+
+			return err
+		}
 	}
 
 	return nil

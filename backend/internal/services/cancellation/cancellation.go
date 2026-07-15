@@ -2,6 +2,7 @@ package cancellation
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -10,8 +11,10 @@ import (
 
 	"supermarket/internal/http/dto"
 	"supermarket/internal/models"
+	"supermarket/internal/repository"
 	"supermarket/internal/repository/cancellation"
 	"supermarket/internal/repository/transactions"
+	"supermarket/internal/services"
 	"supermarket/internal/services/stock"
 )
 
@@ -132,25 +135,40 @@ func (s *service) DeleteCancellation(ctx context.Context, id uuid.UUID) error {
 func (s *service) UpdateCancellation(ctx context.Context, cancellation *models.Cancellation) error {
 	const op = "services.cancellation.updateCancellation"
 
-	log := s.logger.With("op", op)
+	log := s.logger.With("op", op).
+		With("cancellation", *cancellation)
 
 	return s.uow.Do(ctx, func(ctx context.Context, repos transactions.Repositories) error {
 		if err := repos.Stock.UpdateStockByCancellation(ctx, cancellation.ID, cancellation.Quantity); err != nil {
-			log.Error("failed to set count stock",
-				slog.Any("error", err),
-				slog.Any("cancellation", *cancellation),
-			)
+			switch {
+			case errors.Is(err, repository.ErrNotFound):
+				log.Error("cancellation not found")
 
-			return err
+				return services.ErrNotFound
+
+			default:
+				log.Error("failed to set count stock",
+					slog.Any("error", err),
+				)
+
+				return err
+			}
 		}
 
 		if err := repos.Cancellation.Update(ctx, cancellation); err != nil {
-			log.Error("failed to update cancellation",
-				slog.Any("error", err),
-				slog.Any("cancellation", *cancellation),
-			)
+			switch {
+			case errors.Is(err, repository.ErrNotFound):
+				log.Error("cancellation not found")
 
-			return err
+				return services.ErrNotFound
+
+			default:
+				log.Error("failed to update cancellation",
+					slog.Any("error", err),
+				)
+
+				return err
+			}
 		}
 
 		return nil
